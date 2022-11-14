@@ -1,0 +1,41 @@
+{
+    "status": true,
+    "message": "Address was successfully generated",
+    "address": {
+      "id": "646b567e-3a8b-4d1f-a13d-6d69b7e97128",
+      "reference": "ADDR_R2XrLSC8GOPlRKUisqnCo",
+      "address": "tb1qdlf6etk3x27f0g9l93p74d72c4h032x7c4unc2",
+      "merchant_id": "bcdb4d21-1821-4407-9978-e66224805928",
+      "coin": {
+        "id": "62fb9250-edd0-43de-8807-226cfde9f91f",
+        "human_readable_name": "Bitcoin",
+        "code": "BTC",
+        "is_fiat": false,
+        "image": "https://res.cloudinary.com/fluidcoins/image/upload/v1628532776/cryptologos/bitcoin-btc-logo_htxbjj.svg",
+        "is_available_on_widget": false,
+        "is_stable_coin": false,
+        "multiplier": 100000000,
+        "has_test_net": true,
+        "metadata": {
+          "minimum_deposit_amount": 0,
+          "minimum_payout_amount": 0,
+          "payout_fee": 0,
+          "minimum_widget_payment": 0,
+          "minimum_liquidity_amount": 0
+        },
+        "networks": [
+          "BTC"
+        ],
+        "created_at": "2021-07-17T00:41:07.034232Z",
+        "updated_at": "2021-07-17T00:41:07.034232Z"
+      },
+      "domain": "test",
+      "metadata": {
+        "destination_tag": 0,
+        "memo": "",
+        "network": "BTC"
+      },
+      "created_at": "2022-09-11T14:37:54.696288321Z",
+      "updated_at": "2022-09-11T14:37:54.696288412Z"
+    }
+  }
