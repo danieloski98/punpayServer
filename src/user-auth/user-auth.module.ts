@@ -9,6 +9,7 @@ import { EmailService } from 'src/global-services/email/email.service';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { NextOfKinEntity } from 'src/user/Entities/NextofKin.entity';
 
+
 @Module({
   imports: [
     HttpModule,
