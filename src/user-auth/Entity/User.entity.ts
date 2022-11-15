@@ -13,7 +13,7 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   quidax_id: string;
 
   @Column({ nullable: false })

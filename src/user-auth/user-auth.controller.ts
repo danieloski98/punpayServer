@@ -11,8 +11,9 @@ export class UserAuthController {
 
   @ApiTags('USER-AUTH')
   @ApiBody({ type: CreateAccountDTO })
-  @Post('create-account')
+  @Post('create/account')
   createAccount(@Body() body: CreateAccountDTO) {
+    console.log('user creation');
     return this.userService.createUser(body);
   }
 

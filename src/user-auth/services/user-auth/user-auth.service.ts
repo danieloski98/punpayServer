@@ -17,6 +17,8 @@ import { HttpService } from '@nestjs/axios';
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomNumber = require('random-number');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const axios = require('axios');
 
 @Injectable()
 export class UserAuthService {
@@ -31,64 +33,71 @@ export class UserAuthService {
   ) {}
 
   async createUser(user: CreateAccountDTO) {
-    // find by email
-    const account = await this.userRepo.findOne({
-      where: { email: user.email },
-    });
-    console.log(account);
-    if (account !== null) {
-      throw new BadRequestException('Email already in use');
-    }
-    const newUser = await this.userRepo.create({ ...user }).save();
-    // create balance
-    await this.balanceRepo.create({ userId: newUser.id }).save();
-    // create wallets for user
-    // send email
-    // generate code
-    const options = {
-      min: 10000,
-      max: 19999,
-      integer: true,
-    };
-    const code = randomNumber(options);
-    const otp = await this.otpRepo
-      .create({ userId: newUser.id, code, type: OTP_TYPE.EMAIL_VERIFICATION })
-      .save();
-    const timeOut = setTimeout(async () => {
-      await this.otpRepo.update({ id: otp.id }, { expired: true });
-      this.logger.debug('OTP cleared!!!');
-      clearTimeout(timeOut);
-    }, 10000 * 60);
-    const email = await this.emailService.sendConfirmationEmail(
-      user.email,
-      code,
-    );
     // create quidax sub user
-    const request = await this.httpService
-      .post(``, {
-        first_name: user.firstName,
-        last_name: user.lastName,
-        email: user.email,
-      })
-      .subscribe({
-        next: async (data) => {
-          console.log(data.data);
-          await this.userRepo.update(
-            { id: newUser.id },
-            { quidax_id: data.data.data.id },
-          );
-          request.unsubscribe();
+    try {
+      const result = await axios.post(
+        `https://www.quidax.com/api/v1/users`,
+        {
+          first_name: user.firstName,
+          last_name: user.lastName,
+          email: user.email,
         },
-        error: (error) => {
-          throw new BadRequestException(`${error.message}`);
-          request.unsubscribe();
+        {
+          headers: {
+            authorization: `Bearer ${process.env.QDX_SECRET}`,
+            'content-type': 'application/json',
+          },
         },
+      );
+      // find by email
+      const account = await this.userRepo.findOne({
+        where: { email: user.email },
       });
-    this.logger.debug(email.successMessage);
-    return {
-      message: 'Account created',
-      data: newUser,
-    };
+      if (account !== null) {
+        throw new BadRequestException('Email already in use');
+      }
+      console.log(result.data);
+      const newUser = await this.userRepo
+        .create({ ...user, quidax_id: result.data.data.id })
+        .save();
+      // create balance
+      await this.balanceRepo.create({ userId: newUser.id }).save();
+      // create wallets for user
+      // send email
+      // generate code
+      const options = {
+        min: 10000,
+        max: 19999,
+        integer: true,
+      };
+      const code = randomNumber(options);
+      const otp = await this.otpRepo
+        .create({ userId: newUser.id, code, type: OTP_TYPE.EMAIL_VERIFICATION })
+        .save();
+      const timeOut = setTimeout(async () => {
+        await this.otpRepo.update({ id: otp.id }, { expired: true });
+        this.logger.debug('OTP cleared!!!');
+        clearTimeout(timeOut);
+      }, 10000 * 60);
+      const email = await this.emailService.sendConfirmationEmail(
+        user.email,
+        code,
+      );
+      return {
+        message: 'Account created successfully',
+      };
+    } catch (error) {
+      throw new BadRequestException(error.response.data.message);
+    }
+    // if (request.status !== 200) {
+    //   console.log(request.data);
+    //   await this.userRepo.delete({ id: newUser.id });
+    //   throw new BadRequestException(request.data);
+    // } else {
+    //   return {
+    //     message: 'Account created succesfully',
+    //   };
+    // }
   }
 
   async verifyCode(code: number) {
