@@ -1,0 +1,33 @@
+export const DATA = {
+  id: 1,
+  name: 'Access Bank',
+  slug: 'access-bank',
+  code: '044',
+  longcode: '044150149',
+  gateway: 'emandate',
+  pay_with_bank: false,
+  active: true,
+  country: 'Nigeria',
+  currency: 'NGN',
+  type: 'nuban',
+  is_deleted: false,
+  createdAt: '2016-07-14T10:04:29.000Z',
+  updatedAt: '2020-02-18T08:06:44.000Z',
+};
+
+// {
+//     "id": 9,
+//     "name": "Guaranty Trust Bank",
+//     "slug": "guaranty-trust-bank",
+//     "code": "058",
+//     "longcode": "058152036",
+//     "gateway": "ibank",
+//     "pay_with_bank": true,
+//     "active": true,
+//     "country": "Nigeria",
+//     "currency": "NGN",
+//     "type": "nuban",
+//     "is_deleted": false,
+//     "createdAt": "2016-07-14T10:04:29.000Z",
+//     "updatedAt": "2022-06-14T06:59:27.000Z"
+//   },

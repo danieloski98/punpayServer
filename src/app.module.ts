@@ -7,6 +7,8 @@ import { UserAuthModule } from './user-auth/user-auth.module';
 import { EmailService } from './global-services/email/email.service';
 import { UserModule } from './user/user.module';
 import { BankModule } from './bank/bank.module';
+import { AdminAuthModule } from './admin-auth/admin-auth.module';
+import { RateModule } from './rate/rate.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 import Entities from './Entities';
@@ -35,6 +37,8 @@ import Entities from './Entities';
     UserAuthModule,
     UserModule,
     BankModule,
+    AdminAuthModule,
+    RateModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

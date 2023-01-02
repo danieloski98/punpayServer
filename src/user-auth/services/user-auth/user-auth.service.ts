@@ -35,20 +35,20 @@ export class UserAuthService {
   async createUser(user: CreateAccountDTO) {
     // create quidax sub user
     try {
-      const result = await axios.post(
-        `https://www.quidax.com/api/v1/users`,
-        {
-          first_name: user.firstName,
-          last_name: user.lastName,
-          email: user.email,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${process.env.QDX_SECRET}`,
-            'content-type': 'application/json',
-          },
-        },
-      );
+      // const result = await axios.post(
+      //   `https://www.quidax.com/api/v1/users`,
+      //   {
+      //     first_name: user.firstName,
+      //     last_name: user.lastName,
+      //     email: user.email,
+      //   },
+      //   {
+      //     headers: {
+      //       authorization: `Bearer ${process.env.QDX_SECRET}`,
+      //       'content-type': 'application/json',
+      //     },
+      //   },
+      // );
       // find by email
       const account = await this.userRepo.findOne({
         where: { email: user.email },
@@ -56,10 +56,8 @@ export class UserAuthService {
       if (account !== null) {
         throw new BadRequestException('Email already in use');
       }
-      console.log(result.data);
-      const newUser = await this.userRepo
-        .create({ ...user, quidax_id: result.data.data.id })
-        .save();
+      // console.log(result.data);
+      const newUser = await this.userRepo.create({ ...user }).save();
       // create balance
       await this.balanceRepo.create({ userId: newUser.id }).save();
       // create wallets for user
