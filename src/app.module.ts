@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import { BankModule } from './bank/bank.module';
 import { AdminAuthModule } from './admin-auth/admin-auth.module';
 import { RateModule } from './rate/rate.module';
+import { CoinModule } from './coin/coin.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 import Entities from './Entities';
@@ -39,6 +40,7 @@ import Entities from './Entities';
     BankModule,
     AdminAuthModule,
     RateModule,
+    CoinModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService],

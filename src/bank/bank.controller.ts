@@ -7,11 +7,6 @@ import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
 
-type Banks = {
-  message: string;
-  data: IBank[];
-};
-
 @ApiTags('BANKS')
 @Controller('bank')
 export class BankController {

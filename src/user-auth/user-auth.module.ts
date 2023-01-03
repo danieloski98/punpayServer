@@ -8,6 +8,8 @@ import { OtpEntity } from './Entity/Otp.Entity';
 import { EmailService } from 'src/global-services/email/email.service';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { NextOfKinEntity } from 'src/user/Entities/NextofKin.entity';
+import { CoinService } from 'src/coin/services/coin/coin.service';
+import { CoinEntity } from 'src/coin/Entities/Coin';
 
 @Module({
   imports: [
@@ -17,10 +19,11 @@ import { NextOfKinEntity } from 'src/user/Entities/NextofKin.entity';
       OtpEntity,
       BalanceEntity,
       NextOfKinEntity,
+      CoinEntity,
     ]),
   ],
   controllers: [UserAuthController],
-  providers: [UserAuthService, EmailService],
+  providers: [UserAuthService, EmailService, CoinService],
   exports: [TypeOrmModule],
 })
 export class UserAuthModule {}
