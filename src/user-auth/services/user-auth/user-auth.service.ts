@@ -13,6 +13,7 @@ import { genSalt, hash } from 'bcrypt';
 import { PasswordResetDTO } from 'src/user-auth/DTO/PasswordReset';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { HttpService } from '@nestjs/axios';
+import { CoinService } from 'src/coin/services/coin/coin.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -30,6 +31,7 @@ export class UserAuthService {
     private balanceRepo: Repository<BalanceEntity>,
     private emailService: EmailService,
     private httpService: HttpService,
+    private coinService: CoinService,
   ) {}
 
   async createUser(user: CreateAccountDTO) {
@@ -77,6 +79,7 @@ export class UserAuthService {
         this.logger.debug('OTP cleared!!!');
         clearTimeout(timeOut);
       }, 10000 * 60);
+      await this.coinService.createCoinsForUser(newUser.id);
       const email = await this.emailService.sendConfirmationEmail(
         user.email,
         code,
@@ -85,6 +88,7 @@ export class UserAuthService {
         message: 'Account created successfully',
       };
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(error.response.data.message);
     }
     // if (request.status !== 200) {
