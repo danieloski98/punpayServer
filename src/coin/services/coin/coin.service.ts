@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { COIN_TYPE } from 'src/Enums/COIN_TYPE';
+import fluidcoins from 'src/UTILS/fluidcoin';
 import { CoinEntity } from 'src/coin/Entities/Coin';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
 import { Repository } from 'typeorm';
@@ -22,6 +23,8 @@ export class CoinService {
   ) {}
 
   async createCoinsForUser(userId: string) {
+    const supportedCurrencies = fluidcoins.getCurrencies();
+
     for (let i = 0; i < coins.length; i++) {
       await this.coinRepo
         .create({
@@ -35,17 +38,19 @@ export class CoinService {
     }
     return {
       message: 'Accounts created',
+      data: supportedCurrencies,
     };
   }
 
-  async getCoins(userId: string) {
-    const coins = await this.coinRepo.find({ where: { userId } });
-    if (coins.length < 1) {
-      throw new BadRequestException("You haven't created your addresses");
-    }
+  async getCoins(userId?: string) {
+    // const coins = await this.coinRepo.find({ where: { userId } });
+    const supportedCurrencies = await fluidcoins.getCurrencies();
+    // if (coins.length < 1) {
+    //   throw new BadRequestException("You haven't created your addresses");
+    // }
     return {
       message: 'Coins',
-      data: coins,
+      data: supportedCurrencies,
     };
   }
 

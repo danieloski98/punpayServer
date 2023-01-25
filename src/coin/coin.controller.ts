@@ -9,15 +9,15 @@ import { AuthorizationGuard } from 'src/guards/authorization.guard';
 export class CoinController {
   constructor(private coinService: CoinService) {}
 
-  @UseGuards(new AuthorizationGuard())
+  // @UseGuards(new AuthorizationGuard())
   @Get('coins')
   getCoins(@User() user: any) {
-    return this.coinService.getCoins(user.id);
+    return this.coinService.getCoins();
   }
 
   @UseGuards(new AuthorizationGuard())
   @ApiParam({ name: 'id' })
-  @Get('coin/:id')
+  @Get(':id')
   getCoin(@Param() param: { id: string }) {
     return this.coinService.getCoinById(param.id);
   }

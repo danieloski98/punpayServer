@@ -14,12 +14,30 @@ import { PasswordResetDTO } from 'src/user-auth/DTO/PasswordReset';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { HttpService } from '@nestjs/axios';
 import { CoinService } from 'src/coin/services/coin/coin.service';
+import fluidcoins from 'src/UTILS/fluidcoin';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomNumber = require('random-number');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const axios = require('axios');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import {} from '@nestjs/axios';
+
+type Customer = {
+  customer: {
+    created_at: string;
+    domain: string;
+    email: string;
+    full_name: string;
+    id: string;
+    is_blacklisted: boolean;
+    merchant_id: string;
+    phone_number: string;
+    reference: string;
+    updated_at: string;
+  };
+};
 
 @Injectable()
 export class UserAuthService {
@@ -36,70 +54,48 @@ export class UserAuthService {
 
   async createUser(user: CreateAccountDTO) {
     // create quidax sub user
-    try {
-      // const result = await axios.post(
-      //   `https://www.quidax.com/api/v1/users`,
-      //   {
-      //     first_name: user.firstName,
-      //     last_name: user.lastName,
-      //     email: user.email,
-      //   },
-      //   {
-      //     headers: {
-      //       authorization: `Bearer ${process.env.QDX_SECRET}`,
-      //       'content-type': 'application/json',
-      //     },
-      //   },
-      // );
-      // find by email
-      const account = await this.userRepo.findOne({
-        where: { email: user.email },
-      });
-      if (account !== null) {
-        throw new BadRequestException('Email already in use');
-      }
-      // console.log(result.data);
-      const newUser = await this.userRepo.create({ ...user }).save();
-      // create balance
-      await this.balanceRepo.create({ userId: newUser.id }).save();
-      // create wallets for user
-      // send email
-      // generate code
-      const options = {
-        min: 10000,
-        max: 19999,
-        integer: true,
-      };
-      const code = randomNumber(options);
-      const otp = await this.otpRepo
-        .create({ userId: newUser.id, code, type: OTP_TYPE.EMAIL_VERIFICATION })
-        .save();
-      const timeOut = setTimeout(async () => {
-        await this.otpRepo.update({ id: otp.id }, { expired: true });
-        this.logger.debug('OTP cleared!!!');
-        clearTimeout(timeOut);
-      }, 10000 * 60);
-      await this.coinService.createCoinsForUser(newUser.id);
-      const email = await this.emailService.sendConfirmationEmail(
-        user.email,
-        code,
-      );
-      return {
-        message: 'Account created successfully',
-      };
-    } catch (error) {
-      console.log(error);
-      throw new BadRequestException(error.response.data.message);
+    const account = await this.userRepo.findOne({
+      where: { email: user.email },
+    });
+    if (account !== null) {
+      throw new BadRequestException('Email already in use');
     }
-    // if (request.status !== 200) {
-    //   console.log(request.data);
-    //   await this.userRepo.delete({ id: newUser.id });
-    //   throw new BadRequestException(request.data);
-    // } else {
-    //   return {
-    //     message: 'Account created succesfully',
-    //   };
-    // }
+    const obj = {
+      full_name: `${user.firstName} ${user.lastName}`,
+      email: user.email,
+    };
+    const newUser = await this.userRepo
+      .create({
+        ...user,
+      })
+      .save();
+    // create balance
+    await this.balanceRepo.create({ userId: newUser.id }).save();
+    // create wallets for user
+    // send email
+    // generate code
+    const options = {
+      min: 10000,
+      max: 19999,
+      integer: true,
+    };
+    const code = randomNumber(options);
+    const otp = await this.otpRepo
+      .create({ userId: newUser.id, code, type: OTP_TYPE.EMAIL_VERIFICATION })
+      .save();
+    const timeOut = setTimeout(async () => {
+      await this.otpRepo.update({ id: otp.id }, { expired: true });
+      this.logger.debug('OTP cleared!!!');
+      clearTimeout(timeOut);
+    }, 10000 * 60);
+    await this.coinService.createCoinsForUser(newUser.id);
+    const email = await this.emailService.sendConfirmationEmail(
+      user.email,
+      code,
+    );
+    return {
+      message: 'Account created successfully',
+    };
   }
 
   async verifyCode(code: number) {

@@ -14,7 +14,13 @@ export class UserEntity extends BaseEntity {
   id: string;
 
   @Column({ nullable: true })
-  quidax_id: string;
+  fluidCoinId: string;
+
+  @Column({ nullable: true })
+  fluidCoinReference: string;
+
+  @Column({ nullable: true })
+  merchantId: string;
 
   @Column({ nullable: false })
   firstName: string;
