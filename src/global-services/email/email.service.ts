@@ -75,7 +75,7 @@ export class EmailService {
         </br>
         <b>${code}</b>  </br>
 
-        <p>support@listify.com</p>
+        <p>support@punpay.co</p>
 
         </div>`,
       };

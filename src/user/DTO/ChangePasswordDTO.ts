@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsAlphanumeric, IsNotEmpty, MinLength, IsUUID } from 'class-validator';
+import { IsNotEmpty, MinLength, IsUUID, Matches } from 'class-validator';
 
 export class ChangePasswordDTO {
   @ApiProperty()
@@ -9,13 +9,12 @@ export class ChangePasswordDTO {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsAlphanumeric()
   @MinLength(8)
   oldPassword: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsAlphanumeric()
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)
   @MinLength(8)
   newPassword: string;
 }

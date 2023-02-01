@@ -48,7 +48,7 @@ export class CrudService {
     const newIsOld = await compare(payload.newPassword, user.password);
     if (!oldMatch) {
       throw new BadRequestException(
-        'Password does not match',
+        'Old Password does not match',
         `Error Code ${ERROR_CODES.PASSWORD_DO_NOT_MATCH}`,
       );
     }

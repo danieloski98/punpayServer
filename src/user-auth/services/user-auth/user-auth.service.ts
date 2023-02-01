@@ -9,7 +9,7 @@ import { sign } from 'jsonwebtoken';
 import { LoginDTO } from 'src/user-auth/DTO/LoginDTO';
 import { OTP_TYPE } from 'src/Enums/OTP_Type';
 import { ERROR_CODES } from 'src/UTILS/ErrorCodes';
-import { genSalt, hash } from 'bcrypt';
+import { compare, genSalt, hash } from 'bcrypt';
 import { PasswordResetDTO } from 'src/user-auth/DTO/PasswordReset';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { HttpService } from '@nestjs/axios';
@@ -93,8 +93,21 @@ export class UserAuthService {
       user.email,
       code,
     );
+    const token = sign(
+      { email: user.email, password: user.password, id: newUser.id },
+      process.env.JWT_KEY,
+      {
+        expiresIn: '5h',
+        algorithm: 'HS256',
+      },
+    );
+    delete newUser.password;
     return {
       message: 'Account created successfully',
+      data: {
+        token,
+        user: newUser,
+      },
     };
   }
 
@@ -163,7 +176,12 @@ export class UserAuthService {
       where: { email: userCred.email },
     });
     if (user === null) {
-      throw new BadRequestException('Account not found');
+      throw new BadRequestException('Incorrect Email or Password');
+    }
+    // compare password
+    const match = await compare(userCred.password, user.password);
+    if (!match) {
+      throw new BadRequestException('Incorrect Email or Password');
     }
     const token = sign({ ...userCred, id: user.id }, process.env.JWT_KEY, {
       expiresIn: '5h',
@@ -181,26 +199,32 @@ export class UserAuthService {
 
   async passwordResetRequest(email: string) {
     const account = await this.userRepo.findOne({ where: { email } });
-    if (account !== null) {
-      // send email
-      // generate code
-      const options = {
-        min: 10000,
-        max: 19999,
-        integer: true,
-      };
-      const code = randomNumber(options);
-      const otp = await this.otpRepo
-        .create({ userId: account.id, code, type: OTP_TYPE.PASSWORD_RESET })
-        .save();
-      const timeOut = setTimeout(async () => {
-        await this.otpRepo.update({ id: otp.id }, { expired: true });
-        this.logger.debug('OTP cleared!!!');
-        clearTimeout(timeOut);
-      }, 10000 * 60);
+    if (account === null || account == undefined) {
+      throw new BadRequestException('Account not found');
     }
+
+    // send email
+    // generate code
+    const options = {
+      min: 10000,
+      max: 19999,
+      integer: true,
+    };
+    const code = randomNumber(options);
+    const otp = await this.otpRepo
+      .create({ userId: account.id, code, type: OTP_TYPE.PASSWORD_RESET })
+      .save();
+    await this.emailService.sendPasswordResetCode(account.email, code);
+    const timeOut = setTimeout(async () => {
+      await this.otpRepo.update({ id: otp.id }, { expired: true });
+      this.logger.debug('OTP cleared!!!');
+      clearTimeout(timeOut);
+    }, 10000 * 60);
     return {
       message: 'Code sent to email',
+      data: {
+        id: account.id ? account.id : '',
+      },
     };
   }
 
@@ -229,7 +253,11 @@ export class UserAuthService {
   }
 
   async resetPassword(payload: PasswordResetDTO) {
-    const user = await this.userRepo.findOne({ where: { id: payload.id } });
+    const code = await this.otpRepo.findOne({ where: { code: +payload.code } });
+    if (code === null || code === undefined) {
+      throw new BadRequestException('Invalid coode');
+    }
+    const user = await this.userRepo.findOne({ where: { id: code.userId } });
     if (user === null) {
       throw new BadRequestException(
         ERROR_CODES.USER_NOT_FOUND,
@@ -238,7 +266,7 @@ export class UserAuthService {
     }
     const salt = await genSalt(10);
     const hashPassword = await hash(payload.password, salt);
-    await this.userRepo.update({ id: payload.id }, { password: hashPassword });
+    await this.userRepo.update({ id: code.userId }, { password: hashPassword });
     return {
       message: 'Password Reset',
     };

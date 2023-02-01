@@ -112,8 +112,10 @@ export class BanksService {
           userId,
         },
       );
+      const bankk = await this.bankRepo.findOne({ where: { userId } });
       return {
-        message: 'Account created and linked',
+        message: 'Account updated and linked',
+        data: bankk,
       };
     } catch (error) {
       const err: AxiosError<any, any> = error;

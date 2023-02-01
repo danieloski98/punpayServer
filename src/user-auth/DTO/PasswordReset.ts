@@ -1,15 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID, IsAlphanumeric, MinLength } from 'class-validator';
+import { IsNotEmpty, MinLength, IsString, Matches } from 'class-validator';
 
 export class PasswordResetDTO {
   @ApiProperty()
   @IsNotEmpty()
-  @IsUUID()
-  id: string;
+  @IsString()
+  code: string;
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsAlphanumeric()
   @MinLength(8)
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)
   password: string;
 }
