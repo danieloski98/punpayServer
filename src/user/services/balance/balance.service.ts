@@ -1,20 +1,40 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { quidax } from 'src/UTILS/quidax';
+import { Wallet } from 'src/types/wallet';
+import { UserEntity } from 'src/user-auth/Entity/User.entity';
 import { BalanceEntity } from 'src/user/Entities/Balance.entity';
 import { Repository } from 'typeorm';
 
+const WALLETS = ['btc', 'eth', 'usdt', 'busd', 'bnb', 'xrp', 'doge'];
 @Injectable()
 export class BalanceService {
   constructor(
     @InjectRepository(BalanceEntity)
     private balanceRepo: Repository<BalanceEntity>,
+    @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
   ) {}
 
   async getBalance(id: string) {
-    const balance = await this.balanceRepo.findOne({ where: { userId: id } });
-
-    if (balance === undefined) {
-      throw new BadRequestException('Record not found');
+    let balance = 0;
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+    const data = await quidax.wallets.fetchAllWallets(user.quidaxId);
+    if (data) {
+      const wallets: Array<Wallet> = data.data;
+      wallets.map((item) => {
+        if (WALLETS.includes(item.currency)) {
+          balance += +item.converted_balance;
+        }
+      });
+      return {
+        message: 'balance',
+        data: {
+          balance,
+        },
+      };
     }
     return {
       messgae: 'Balance',

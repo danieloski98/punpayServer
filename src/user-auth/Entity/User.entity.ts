@@ -20,7 +20,7 @@ export class UserEntity extends BaseEntity {
   fluidCoinReference: string;
 
   @Column({ nullable: true })
-  merchantId: string;
+  quidaxId: string;
 
   @Column({ nullable: false })
   firstName: string;

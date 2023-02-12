@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsString,
-  IsOptional,
-  IsDateString,
-  IsEmail,
-} from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEmail } from 'class-validator';
 
 export class CreateNextOfKinDTO {
   @ApiProperty()
@@ -27,11 +21,6 @@ export class CreateNextOfKinDTO {
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  // @IsDateString()
-  DOB: string;
 
   @ApiProperty()
   @IsNotEmpty()

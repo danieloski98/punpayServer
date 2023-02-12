@@ -21,9 +21,6 @@ export class NextOfKinEntity extends BaseEntity {
   email: string;
 
   @Column({ nullable: false })
-  DOB: string;
-
-  @Column({ nullable: false })
   relationship: string;
 
   @Column({ default: new Date().toISOString() })

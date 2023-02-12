@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpCode,
+  HttpException,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailService } from 'src/global-services/email/email.service';
 import { CreateAccountDTO } from 'src/user-auth/DTO/CreateAccountDTO';
@@ -23,6 +29,7 @@ const randomNumber = require('random-number');
 const axios = require('axios');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import {} from '@nestjs/axios';
+import { quidax } from 'src/UTILS/quidax';
 
 type Customer = {
   customer: {
@@ -53,62 +60,80 @@ export class UserAuthService {
   ) {}
 
   async createUser(user: CreateAccountDTO) {
-    // create quidax sub user
-    const account = await this.userRepo.findOne({
-      where: { email: user.email },
-    });
-    if (account !== null) {
-      throw new BadRequestException('Email already in use');
+    try {
+      // create quidax sub user
+      const account = await this.userRepo.findOne({
+        where: { email: user.email },
+      });
+      if (account !== null) {
+        throw new BadRequestException('Email already in use');
+      }
+      const data = await quidax.users.create({
+        email: user.email,
+        first_name: user.firstName,
+        last_name: user.lastName,
+      });
+
+      console.log(data);
+
+      if (data) {
+        // use the quidax id to create a new user
+        const obj = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          quidaxId: data.data.id,
+          password: user.password,
+        };
+        const newUser = await this.userRepo.create(obj).save();
+        // create balance
+        await this.balanceRepo.create({ userId: newUser.id }).save();
+        // create wallets for user
+        // send email
+        // generate code
+        const options = {
+          min: 10000,
+          max: 19999,
+          integer: true,
+        };
+        const code = randomNumber(options);
+        const otp = await this.otpRepo
+          .create({
+            userId: newUser.id,
+            code,
+            type: OTP_TYPE.EMAIL_VERIFICATION,
+          })
+          .save();
+        const timeOut = setTimeout(async () => {
+          await this.otpRepo.update({ id: otp.id }, { expired: true });
+          this.logger.debug('OTP cleared!!!');
+          clearTimeout(timeOut);
+        }, 10000 * 60);
+        await this.coinService.createCoinsForUser(newUser.id);
+        const email = await this.emailService.sendConfirmationEmail(
+          user.email,
+          code,
+        );
+        const token = sign(
+          { email: user.email, password: user.password, id: newUser.id },
+          process.env.JWT_KEY,
+          {
+            expiresIn: '5h',
+            algorithm: 'HS256',
+          },
+        );
+        delete newUser.password;
+        return {
+          message: 'Account created successfully',
+          data: {
+            token,
+            user: newUser,
+          },
+        };
+      }
+    } catch (error) {
+      throw new HttpException(error.message, 500);
     }
-    const obj = {
-      full_name: `${user.firstName} ${user.lastName}`,
-      email: user.email,
-    };
-    const newUser = await this.userRepo
-      .create({
-        ...user,
-      })
-      .save();
-    // create balance
-    await this.balanceRepo.create({ userId: newUser.id }).save();
-    // create wallets for user
-    // send email
-    // generate code
-    const options = {
-      min: 10000,
-      max: 19999,
-      integer: true,
-    };
-    const code = randomNumber(options);
-    const otp = await this.otpRepo
-      .create({ userId: newUser.id, code, type: OTP_TYPE.EMAIL_VERIFICATION })
-      .save();
-    const timeOut = setTimeout(async () => {
-      await this.otpRepo.update({ id: otp.id }, { expired: true });
-      this.logger.debug('OTP cleared!!!');
-      clearTimeout(timeOut);
-    }, 10000 * 60);
-    await this.coinService.createCoinsForUser(newUser.id);
-    const email = await this.emailService.sendConfirmationEmail(
-      user.email,
-      code,
-    );
-    const token = sign(
-      { email: user.email, password: user.password, id: newUser.id },
-      process.env.JWT_KEY,
-      {
-        expiresIn: '5h',
-        algorithm: 'HS256',
-      },
-    );
-    delete newUser.password;
-    return {
-      message: 'Account created successfully',
-      data: {
-        token,
-        user: newUser,
-      },
-    };
   }
 
   async verifyCode(code: number) {

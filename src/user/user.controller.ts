@@ -16,6 +16,7 @@ import { CreateNextOfKinDTO } from './DTO/CreateNextOfKinDTO';
 import { BalanceService } from './services/balance/balance.service';
 import { CrudService } from './services/crud/crud.service';
 import { Next0fkinService } from './services/next0fkin/next0fkin.service';
+import { WalletService } from './services/wallet/wallet.service';
 
 export interface IUser {
   id: string;
@@ -29,6 +30,7 @@ export class UserController {
     private crudService: CrudService,
     private nextofkinService: Next0fkinService,
     private balanceService: BalanceService,
+    private walletService: WalletService,
   ) {}
 
   @ApiTags('USER')
@@ -36,6 +38,13 @@ export class UserController {
   @Get('/profile/:id')
   getUserbyID(@Param() param: { id: string }) {
     return this.crudService.getUserByID(param.id);
+  }
+
+  @ApiTags('USER')
+  @ApiParam({ name: 'user_id' })
+  @Get('/wallets/:user_id')
+  getWallets(@Param('user_id') param: any) {
+    return this.walletService.getWallets(param);
   }
 
   @ApiTags('ADMIN:USER')
@@ -59,6 +68,15 @@ export class UserController {
   getBalance(@User() User: IUser) {
     console.log('balance');
     return this.balanceService.getBalance(User.id);
+  }
+
+  @ApiTags('USER')
+  @UseGuards(new AuthorizationGuard())
+  @ApiParam({ name: 'currency' })
+  @Get('wallet/:currency')
+  getWallet(@User() User: IUser, @Param('currency') param: any) {
+    console.log('balance');
+    return this.walletService.getWalletById(User.id, param);
   }
 
   @UseGuards(AuthorizationGuard)
