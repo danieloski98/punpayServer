@@ -14,15 +14,19 @@ require('dotenv').config();
 export class AuthorizationGuard implements CanActivate {
   private logger = new Logger('AuthGuard');
   canActivate(context: ExecutionContext): boolean {
-    const http = context.switchToHttp().getRequest() as Request;
-    const auth = http.headers['authorization'];
-    if (auth === undefined || auth === null) {
-      throw new UnauthorizedException('Not Authorized');
+    try {
+      const http = context.switchToHttp().getRequest() as Request;
+      const auth = http.headers['authorization'];
+      if (auth === undefined || auth === null) {
+        throw new UnauthorizedException('Not Authorized');
+      }
+      const token = auth.split(' ')[1];
+      const val = verify(token, process.env.JWT_KEY);
+      this.logger.verbose(val);
+      http['user'] = val;
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException(error.message);
     }
-    const token = auth.split(' ')[1];
-    const val = verify(token, process.env.JWT_KEY);
-    this.logger.verbose(val);
-    http['user'] = val;
-    return true;
   }
 }

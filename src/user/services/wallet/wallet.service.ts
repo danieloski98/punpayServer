@@ -8,7 +8,17 @@ import { quidax } from 'src/UTILS/quidax';
 import { Wallet } from 'src/types/wallet';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
 import { Repository } from 'typeorm';
-const WALLETS = ['btc', 'eth', 'usdt', 'busd', 'bnb', 'xrp', 'doge'];
+const WALLETS = [
+  'btc',
+  'eth',
+  'usdt',
+  'busd',
+  'bnb',
+  'xrp',
+  'doge',
+  'ltc',
+  'dot',
+];
 @Injectable()
 export class WalletService {
   constructor(

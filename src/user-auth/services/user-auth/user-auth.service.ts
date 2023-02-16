@@ -296,4 +296,17 @@ export class UserAuthService {
       message: 'Password Reset',
     };
   }
+
+  //verify token
+  async verifyToken(user: UserEntity) {
+    const usr = await this.userRepo.findOne({ where: { id: user.id } });
+    if (usr === null || usr === undefined) {
+      throw new BadRequestException('User not found');
+    }
+    delete usr.password;
+    return {
+      message: usr,
+      data: usr,
+    };
+  }
 }
