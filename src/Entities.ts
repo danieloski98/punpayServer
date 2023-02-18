@@ -1,3 +1,4 @@
+import { RateEntity } from './Entities/Rate.entity';
 import { AdminEntity } from './admin-auth/Entities/Admin.Entity';
 import { BankEntity } from './bank/Entities/Bank';
 import { CoinEntity } from './coin/Entities/Coin';
@@ -14,6 +15,7 @@ const entities = [
   AdminEntity,
   BankEntity,
   CoinEntity,
+  RateEntity,
 ];
 
 export default entities;

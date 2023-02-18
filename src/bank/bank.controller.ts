@@ -6,13 +6,14 @@ import { CreateBankDTO } from './DTO/createBankDTO';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 
 @ApiTags('BANKS')
 @Controller('bank')
 export class BankController {
   constructor(private bankService: BanksService) {}
 
-  @ApiOkResponse({ type: IBank })
+  @ApiOkResponse({ type: IBank, isArray: true })
   @Get()
   getAllBanks() {
     return this.bankService.getBanks();
@@ -30,6 +31,13 @@ export class BankController {
   @Post('create')
   createbank(@Body() body: CreateBankDTO, @User() user: UserEntity) {
     return this.bankService.addBank(user.id, body);
+  }
+
+  // @UseGuards(new AdminAuthGuard())
+  @ApiBody({ type: CreateBankDTO })
+  @Post('admin/create')
+  createbankAdmin(@Body() body: CreateBankDTO) {
+    return this.bankService.addBankAdmin(body);
   }
 
   @ApiOkResponse({ type: IBank })

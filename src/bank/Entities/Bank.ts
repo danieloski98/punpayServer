@@ -11,7 +11,7 @@ export class BankEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   userId: string;
 
   @Column({ type: 'int', nullable: false })
@@ -31,6 +31,9 @@ export class BankEntity extends BaseEntity {
 
   @Column({ type: 'bool', default: false })
   isLinked: boolean;
+
+  @Column({ type: 'bool', default: false })
+  isAdminAccount: boolean;
 
   @Column({
     type: 'varchar',

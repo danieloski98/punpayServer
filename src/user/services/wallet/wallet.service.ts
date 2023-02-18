@@ -17,7 +17,7 @@ const WALLETS = [
   'xrp',
   'doge',
   'ltc',
-  'dot',
+  // 'dot',
 ];
 @Injectable()
 export class WalletService {

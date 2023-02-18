@@ -167,4 +167,37 @@ export class BanksService {
       );
     }
   }
+
+  async addBankAdmin(payload: CreateBankDTO) {
+    try {
+      // reslove ths account
+      const { data } = await this.httpService.axiosRef.get(
+        `https://api.paystack.co/bank/resolve?account_number=${payload.accountNumber}&bank_code=${payload.code}`,
+        { headers: { Authorization: `Bearer ${process.env.PSSK}` } },
+      );
+      // create new Bank
+      const newBank = await this.bankRepo
+        .create({
+          bankId: payload.id,
+          name: payload.name,
+          code: payload.code,
+          accountName: data.data.account_name,
+          accountNumber: data.data.account_number,
+          isLinked: true,
+          isAdminAccount: true,
+        })
+        .save();
+
+      return {
+        message: 'Account created and linked',
+        data: newBank,
+      };
+    } catch (error) {
+      const err: AxiosError<any, any> = error;
+      throw new BadRequestException(
+        err.response.data || err.message,
+        'An error occured while verifying account number',
+      );
+    }
+  }
 }
