@@ -14,7 +14,7 @@ import { Repository } from 'typeorm';
 export class AdminAuthGuard implements CanActivate {
   private logger = new Logger('AuthGuard');
   constructor(
-    @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
+    @InjectRepository(AdminEntity) private adminRepo?: Repository<AdminEntity>,
   ) {}
   async canActivate(context: ExecutionContext) {
     try {
@@ -24,6 +24,7 @@ export class AdminAuthGuard implements CanActivate {
         throw new UnauthorizedException('Not Authorized');
       }
       const token = auth.split(' ')[1];
+      this.logger.warn(token);
       const val = verify(token, process.env.JWT_KEY);
       const admin = await this.adminRepo.findOne({ where: { id: val['id'] } });
       if (admin === undefined) {

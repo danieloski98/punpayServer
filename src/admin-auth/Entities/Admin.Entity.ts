@@ -25,6 +25,9 @@ export class AdminEntity extends BaseEntity {
   @Column({ nullable: false })
   bio: string;
 
+  @Column({ nullable: false, type: 'simple-array' })
+  roles: string[];
+
   @Column({ default: new Date().toISOString() })
   createdAt: string;
 

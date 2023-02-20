@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from 'src/decorators/user.decorator';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 import { IUser } from 'src/user/user.controller';
@@ -7,6 +7,8 @@ import { AdminLoginDTO } from './DTO/AdminLoginDTO';
 import { ChangePassword } from './DTO/ChangePasswordDTO';
 import { CreateAccountDTO } from './DTO/CreateAccountDTO';
 import { CrudService } from './services/crud/crud.service';
+import { Roles } from 'src/decorators/roles.decorator';
+import { RolecheckGuard } from 'src/guards/rolecheck.guard';
 
 @Controller('admin-auth')
 export class AdminAuthController {
@@ -35,9 +37,27 @@ export class AdminAuthController {
 
   @ApiTags('ADMIN-AUTH')
   @UseGuards(AdminAuthGuard)
+  @ApiParam({ name: 'code' })
+  @Post('verify-OTP/:code')
+  verifyOtp(@User() user: IUser, @Param('code') param: any) {
+    return this.crudService.verifyOtp(user.id, param);
+  }
+
+  @ApiTags('ADMIN-AUTH')
+  @UseGuards(AdminAuthGuard)
   @ApiBody({ type: ChangePassword })
   @Put('change-password')
   chnagePassword(@Body() body: ChangePassword) {
     return this.chnagePassword(body);
+  }
+
+  @ApiTags('ADMIN-AUTH')
+  @Get()
+  @Roles('View', 'Transaction')
+  @UseGuards(RolecheckGuard)
+  getRoles() {
+    return {
+      message: 'ehllo',
+    };
   }
 }

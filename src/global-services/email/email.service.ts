@@ -101,21 +101,61 @@ export class EmailService {
     }
   }
 
+  public async generateAdminPassword(email: string, password?: string) {
+    console.log(process.env.MAILGUN_SENDING_KEY);
+    try {
+      const mailOption: MailOptions = {
+        from: `Punpay ${process.env.COMPANY_EMAIL}`,
+        to: email,
+        subject: `Admin Account Created`,
+        html: `
+        <div> 
+          <p>Your admin account has been created successfully.</p>
+          <br />
+          <p>Your Temporary password is</p>
+          </br>
+          <b>${password}</b>  </br>
+          <p>You are adviced to change it once you login.</p>
+          <p>support@Punpay.co</p>
+        </div>`,
+      };
+      this.transport.sendMail(mailOption, (error: any, info: any) => {
+        if (error) {
+          this.logger.error(error);
+        } else {
+          this.logger.log(info);
+        }
+      });
+      return {
+        error: false,
+        successMessage: 'Account creation email sent',
+        statusCode: 200,
+      };
+    } catch (error) {
+      return {
+        error: true,
+        statusCode: 500,
+        trace: error,
+        errorMessage: 'Internal Server error',
+      };
+    }
+  }
+
   public async generateAdminCode(email: string, code?: number) {
     console.log(process.env.MAILGUN_SENDING_KEY);
     try {
       const mailOption: MailOptions = {
         from: `Punpay ${process.env.COMPANY_EMAIL}`,
         to: email,
-        subject: `OTP Code`,
-        html: `<div> 
-          <p>Your OTP code is</p>
-
-        </br>
-        <b>${code}</b>  </br>
-
-        <p>support@listify.com</p>
-
+        subject: `OTP Generated`,
+        html: `
+        <div> 
+          <p>Your OTP has been created successfully.</p>
+          <br />
+          <p>Your Temporary OTP is</p>
+          </br>
+          <b>${code}</b>  </br>
+          <p>support@Punpay.co</p>
         </div>`,
       };
       this.transport.sendMail(mailOption, (error: any, info: any) => {

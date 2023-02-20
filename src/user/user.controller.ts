@@ -17,6 +17,7 @@ import { BalanceService } from './services/balance/balance.service';
 import { CrudService } from './services/crud/crud.service';
 import { Next0fkinService } from './services/next0fkin/next0fkin.service';
 import { WalletService } from './services/wallet/wallet.service';
+import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 
 export interface IUser {
   id: string;
@@ -49,6 +50,7 @@ export class UserController {
 
   @ApiTags('ADMIN:USER')
   @ApiParam({ name: 'id' })
+  @UseGuards(new AdminAuthGuard())
   @Get('')
   getUser() {
     return this.crudService.getAllUsers();

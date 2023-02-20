@@ -9,11 +9,14 @@ import { CreateAccountDTO } from 'src/admin-auth/DTO/CreateAccountDTO';
 import { OtpEntity } from 'src/user-auth/Entity/Otp.Entity';
 import { ChangePassword } from 'src/admin-auth/DTO/ChangePasswordDTO';
 import { EmailService } from 'src/global-services/email/email.service';
-import { OTP_TYPE } from 'src/Enums/OTP_Type';
+import { OTP_TYPE, TYPE_OF_OTP } from 'src/Enums/OTP_Type';
+import { OtpService } from 'src/global-services/otp/otp.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const randomNumber = require('random-number');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const generator = require('generate-password');
 
 @Injectable()
 export class CrudService {
@@ -21,6 +24,7 @@ export class CrudService {
   constructor(
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     @InjectRepository(OtpEntity) private otpRepo: Repository<OtpEntity>,
+    private otpService: OtpService,
     private emailService: EmailService,
   ) {}
 
@@ -29,16 +33,19 @@ export class CrudService {
       where: { email: payload.email },
       select: ['id', 'email', 'bio', 'password'],
     });
+
     if (account === null) {
       throw new BadRequestException('Invalid Email or Password');
     }
 
     const match = await compare(payload.password, account.password);
+    console.log(account);
     if (!match) {
       throw new BadRequestException('Invalid email or password!');
     }
     const token = sign({ ...payload, id: account.id }, process.env.JWT_KEY, {
       algorithm: 'HS256',
+      expiresIn: '2h',
     });
     delete account.password;
     return {
@@ -58,8 +65,25 @@ export class CrudService {
     if (account !== null) {
       throw new BadRequestException('Email already in use');
     }
-    const data = await this.adminRepo.create(payload).save();
+    const password = await generator.generate({
+      length: 10,
+      numbers: true,
+    });
+    // const salt = await genSalt();
+    // const hashP = await hash(password, salt);
+    const obj = {
+      email: payload.email,
+      password,
+      bio: payload.bio,
+      fullname: payload.fullname,
+      roles: payload.roles,
+    };
+    console.log(obj);
+    const data = await this.adminRepo.create(obj).save();
+    // send email
+    await this.emailService.generateAdminPassword(payload.email, password);
     delete data.password;
+    data['password'] = password;
     return {
       message: 'Admin created',
       data,
@@ -67,38 +91,26 @@ export class CrudService {
   }
 
   async generateOTP(id: string) {
-    const user = await this.adminRepo.findOne({ where: { id } });
-    const otpE = await this.otpRepo.findOne({
-      where: { userId: id, type: OTP_TYPE.ADMIN },
-    });
-    if (otpE !== null) {
-      const del = await this.otpRepo.delete({
-        userId: id,
-        type: OTP_TYPE.ADMIN,
-      });
-      console.log(`Deleted Count ${del.affected}`);
+    const otp = await this.otpService.generateOtp(
+      id,
+      'ADMIN',
+      'PAYMENT_VERIFICATION',
+    );
+    return otp;
+  }
+
+  async verifyOtp(userId: string, code: number) {
+    const valid = await this.otpService.verifyOtp(
+      userId,
+      code,
+      'PAYMENT_VERIFICATION',
+    );
+    if (!valid) {
+      throw new BadRequestException('Invalid OTP');
     }
-    if (user === null) {
-      throw new BadRequestException('Account not found');
-    }
-    const options = {
-      min: 10000,
-      max: 19999,
-      integer: true,
-    };
-    const code = randomNumber(options);
-    const otp = await this.otpRepo
-      .create({ userId: user.id, code, type: OTP_TYPE.ADMIN })
-      .save();
-    const timeOut = setTimeout(async () => {
-      await this.otpRepo.update({ id: otp.id }, { expired: true });
-      this.logger.debug('OTP cleared!!!');
-      clearTimeout(timeOut);
-    }, 1000 * 60);
-    const email = await this.emailService.generateAdminCode(user.email, code);
-    this.logger.debug(email);
+
     return {
-      message: 'OTP sent',
+      message: 'OTP valid',
     };
   }
 
