@@ -1,8 +1,11 @@
+import { UserEntity } from 'src/user-auth/Entity/User.entity';
 import {
   BaseEntity,
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -53,4 +56,13 @@ export class BankEntity extends BaseEntity {
   async update() {
     this.updatedAt = new Date().toISOString();
   }
+
+  // relationship
+  @OneToOne(() => UserEntity, (user) => user.bank)
+  @JoinColumn({
+    referencedColumnName: 'id',
+    name: 'userId',
+    foreignKeyConstraintName: 'FKUSERBANK',
+  })
+  user: UserEntity;
 }

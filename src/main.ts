@@ -10,6 +10,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const conf = app.get(ConfigService);
   app.use(morgan('combined'));
+  app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   const port = conf.get('PORT');
   const config = new DocumentBuilder()

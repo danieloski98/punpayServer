@@ -5,8 +5,10 @@ import {
   BaseEntity,
   BeforeUpdate,
   Entity,
+  OneToOne,
 } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
+import { BankEntity } from 'src/bank/Entities/Bank';
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
@@ -57,4 +59,8 @@ export class UserEntity extends BaseEntity {
     const passwordhash = await hash(this.password, salt);
     this.password = passwordhash;
   }
+
+  // Relationships
+  @OneToOne(() => BankEntity, (bank) => bank.user)
+  bank: BankEntity;
 }

@@ -23,7 +23,8 @@ export class CrudService {
   async getUserByID(id: string) {
     const user = await this.userRepo.findOne({
       where: { id },
-      select: ['firstName', 'lastName', 'email', 'createdAt'],
+      // select: ['firstName', 'lastName', 'email', 'createdAt'],
+      relations: ['bank'],
     });
     if (user === null) {
       throw new BadRequestException(

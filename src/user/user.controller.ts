@@ -50,7 +50,7 @@ export class UserController {
 
   @ApiTags('ADMIN:USER')
   @ApiParam({ name: 'id' })
-  @UseGuards(new AdminAuthGuard())
+  @UseGuards(AdminAuthGuard)
   @Get('')
   getUser() {
     return this.crudService.getAllUsers();
