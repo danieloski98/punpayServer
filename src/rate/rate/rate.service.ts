@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RateEntity } from 'src/Entities/Rate.entity';
+import { RateEntity } from 'src/Entities/rate.entity';
 import { Repository } from 'typeorm';
 import { CreateRateDto } from '../dto/createrate.dto';
 import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';

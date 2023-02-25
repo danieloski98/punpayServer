@@ -7,10 +7,10 @@ import { SwapService } from './services/swap/swap.service';
 import { SendService } from './services/send/send.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransactionEntity } from './entities/transaction.entity';
-import { RateEntity } from 'src/Entities/Rate.entity';
-import { BankEntity } from 'src/bank/Entities/Bank.entity';
+import { RateEntity } from 'src/Entities/rate.entity';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { HttpModule, HttpService } from '@nestjs/axios';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 
 @Module({
   imports: [

@@ -5,7 +5,7 @@ import { LoginDTO } from './DTO/LoginDTO';
 import { PasswordResetDTO } from './DTO/PasswordReset';
 import { UserAuthService } from './services/user-auth/user-auth.service';
 import { User } from 'src/decorators/user.decorator';
-import { UserEntity } from './Entity/User.entity';
+import { UserEntity } from './Entity/user.entity';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 
 @Controller('user-auth')

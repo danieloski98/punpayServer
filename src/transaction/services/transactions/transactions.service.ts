@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RateEntity } from 'src/Entities/Rate.entity';
+import { RateEntity } from 'src/Entities/rate.entity';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { _ } from 'src/UTILS/lodash';
 import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
-import { BankEntity } from 'src/bank/Entities/Bank.entity';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { BuyDTO } from 'src/transaction/dto/Buy.dto';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { Repository } from 'typeorm';

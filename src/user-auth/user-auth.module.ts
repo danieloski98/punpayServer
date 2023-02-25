@@ -3,13 +3,13 @@ import { HttpModule } from '@nestjs/axios';
 import { UserAuthController } from './user-auth.controller';
 import { UserAuthService } from './services/user-auth/user-auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './Entity/User.entity';
-import { OtpEntity } from './Entity/Otp.entity';
+import { UserEntity } from './Entity/user.entity';
+import { OtpEntity } from './Entity/otp.entity';
 import { EmailService } from 'src/global-services/email/email.service';
-import { BalanceEntity } from 'src/user/Entities/Balance.entity';
-import { NextOfKinEntity } from 'src/user/Entities/NextofKin.entity';
+import { BalanceEntity } from 'src/user/Entities/balance.entity';
+import { NextOfKinEntity } from 'src/user/Entities/nextofKin.entity';
 import { CoinService } from 'src/coin/services/coin/coin.service';
-import { CoinEntity } from 'src/coin/Entities/Coin.entity';
+import { CoinEntity } from 'src/coin/Entities/coin.entity';
 
 @Module({
   imports: [

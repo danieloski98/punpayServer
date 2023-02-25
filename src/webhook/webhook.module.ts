@@ -4,7 +4,7 @@ import { WebhookController } from './webhook.controller';
 import { NotificationService } from 'src/global-services/notification/notification.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({

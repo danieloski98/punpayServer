@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { UpdateAdminDto } from 'src/admin/DTO/update.dto';
 import { Repository } from 'typeorm';
 

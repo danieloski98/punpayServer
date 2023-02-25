@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { COIN_TYPE } from 'src/Enums/COIN_TYPE';
 import fluidcoins from 'src/UTILS/fluidcoin';
-import { CoinEntity } from 'src/coin/Entities/Coin.entity';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { CoinEntity } from 'src/coin/Entities/coin.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 
 const coins = [

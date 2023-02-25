@@ -8,7 +8,7 @@ import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { depositSuccessful } from 'src/types/depositsuccessful';
 import { withDrawalSuccessful } from 'src/types/withdrawalApproved';
 import { WithdrawalRejected } from 'src/types/withdrawalRejected';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
