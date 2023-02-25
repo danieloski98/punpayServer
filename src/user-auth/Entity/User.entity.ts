@@ -8,18 +8,12 @@ import {
   OneToOne,
 } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
-import { BankEntity } from 'src/bank/Entities/Bank';
+import { BankEntity } from 'src/bank/Entities/Bank.entity';
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ nullable: true })
-  fluidCoinId: string;
-
-  @Column({ nullable: true })
-  fluidCoinReference: string;
 
   @Column({ nullable: true })
   quidaxId: string;

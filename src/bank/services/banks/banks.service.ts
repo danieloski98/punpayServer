@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { CreateBankDTO } from 'src/bank/DTO/createBankDTO';
-import { BankEntity } from 'src/bank/Entities/Bank';
+import { BankEntity } from 'src/bank/Entities/Bank.entity';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
 import { Repository } from 'typeorm';
 import { AxiosError } from 'axios';

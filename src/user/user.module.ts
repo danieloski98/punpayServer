@@ -7,7 +7,7 @@ import { BalanceService } from './services/balance/balance.service';
 import { WalletService } from './services/wallet/wallet.service';
 import { CrudService as AdminService } from '../admin/services/crud/crud.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.Entity';
+import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
 
 @Module({
   imports: [UserAuthModule, TypeOrmModule.forFeature([AdminEntity])],

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { verify } from 'jsonwebtoken';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.Entity';
+import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
 import { CrudService } from 'src/admin/services/crud/crud.service';
 import { Repository } from 'typeorm';
 

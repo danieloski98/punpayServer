@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AdminLoginDTO } from 'src/admin-auth/DTO/AdminLoginDTO';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.Entity';
+import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
 import { Repository } from 'typeorm';
 import { compare, genSalt, hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { CreateAccountDTO } from 'src/admin-auth/DTO/CreateAccountDTO';
-import { OtpEntity } from 'src/user-auth/Entity/Otp.Entity';
+import { OtpEntity } from 'src/user-auth/Entity/Otp.entity';
 import { ChangePassword } from 'src/admin-auth/DTO/ChangePasswordDTO';
 import { EmailService } from 'src/global-services/email/email.service';
 import { OTP_TYPE, TYPE_OF_OTP } from 'src/Enums/OTP_Type';

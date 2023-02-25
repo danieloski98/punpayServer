@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.Entity';
+import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
 import { CrudService } from 'src/admin/services/crud/crud.service';
 
 @Injectable()

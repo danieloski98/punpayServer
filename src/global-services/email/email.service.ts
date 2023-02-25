@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import * as Mg from 'nodemailer-mailgun-transport';
+//import * as Mg from 'nodemailer-mailgun-transport';
 import { MailOptions } from 'nodemailer/lib/ses-transport';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Mg = require('nodemailer-mailgun-transport');
 
 @Injectable()
 export class EmailService {

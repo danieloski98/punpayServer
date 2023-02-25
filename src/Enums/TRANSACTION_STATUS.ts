@@ -1,5 +1,7 @@
 export enum TRANSACTION_STATUS {
+  PENDING = 0,
   PROCESSING = 1,
   CONFIRMED,
   PAID,
+  FAILED,
 }

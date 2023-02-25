@@ -8,4 +8,5 @@ export const SUPPORTED_CURRENCY = [
   'xrp',
   'ltc',
   'ngn',
+  'usd',
 ];

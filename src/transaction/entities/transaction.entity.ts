@@ -11,31 +11,46 @@ export class TransactionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  transactionType: string;
-
-  @Column({ type: 'float4', nullable: true })
-  coinAmount: number;
-
-  @Column({ type: 'float', nullable: true })
-  ngnAmount: number;
-
-  @Column({ type: 'text', nullable: true })
-  addressId: string;
-
-  @Column({ type: 'int', nullable: false })
-  currentRate: number;
-
   @Column({ type: 'text', nullable: false })
   userId: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', nullable: false })
+  quidaxTransactionId: string;
+
+  @Column({ type: 'int', nullable: false })
+  transactionType: number;
+
+  @Column({ type: 'varchar', nullable: true })
   bankId: string;
 
-  @Column({ type: 'text', nullable: false })
-  payoutReference: string;
+  @Column({ type: 'varchar', nullable: true })
+  transactionCurrency: string;
 
-  @Column({ type: 'number', nullable: false })
+  @Column({ type: 'float', nullable: true })
+  transactionAmount: number;
+
+  @Column({ type: 'int', nullable: true })
+  rate: number;
+
+  @Column({ type: 'int', nullable: false })
+  currencyRate: number;
+
+  @Column({ type: 'text', nullable: false })
+  payoutCurrency: string;
+
+  @Column({ type: 'text', nullable: false })
+  hash: string;
+
+  @Column({ type: 'float', nullable: false })
+  payoutAamount: number;
+
+  @Column({ type: 'simple-array', nullable: false })
+  images: string[];
+
+  @Column({ type: 'text', nullable: false })
+  withdrawalAddress: string;
+
+  @Column({ type: 'int', nullable: false })
   status: number;
 
   @Column({

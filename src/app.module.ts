@@ -15,6 +15,10 @@ import { AdminModule } from './admin/admin.module';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 import Entities from './Entities';
+import { NotificationService } from './global-services/notification/notification.service';
+import { HttpModule } from '@nestjs/axios';
+import { dataSourceOptions } from 'db/data-source';
+import { WebhookModule } from './webhook/webhook.module';
 
 @Module({
   imports: [
@@ -22,21 +26,11 @@ import Entities from './Entities';
       isGlobal: true,
       ttl: 60,
     }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      username: process.env.DB_USER,
-      port: +process.env.DB_PORT,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      url: process.env.DATABASE_URI,
-      logging: false,
-      synchronize: true,
-      entities: Entities,
-    }),
+    TypeOrmModule.forRoot(dataSourceOptions),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    HttpModule,
     UserAuthModule,
     UserModule,
     BankModule,
@@ -45,8 +39,9 @@ import Entities from './Entities';
     CoinModule,
     TransactionModule,
     AdminModule,
+    WebhookModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EmailService],
+  providers: [AppService, EmailService, NotificationService],
 })
 export class AppModule {}

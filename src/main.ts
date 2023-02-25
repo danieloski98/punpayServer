@@ -3,8 +3,10 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
-import * as morgan from 'morgan';
+//import * as morgan from 'morgan';
 import { ValidationPipe } from '@nestjs/common';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const morgan = require('morgan');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

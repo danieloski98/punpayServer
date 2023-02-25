@@ -3,7 +3,7 @@ import { BankController } from './bank.controller';
 import { BanksService } from './services/banks/banks.service';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { BankEntity } from './Entities/Bank';
+import { BankEntity } from './Entities/Bank.entity';
 import { UserEntity } from 'src/user-auth/Entity/User.entity';
 
 @Module({
