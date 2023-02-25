@@ -2,8 +2,8 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { quidax } from 'src/UTILS/quidax';
 import { Wallet } from 'src/types/wallet';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
-import { BalanceEntity } from 'src/user/Entities/Balance.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import { BalanceEntity } from 'src/user/Entities/balance.entity';
 import { Repository } from 'typeorm';
 
 const WALLETS = ['btc', 'eth', 'usdt', 'busd', 'bnb', 'xrp', 'doge'];

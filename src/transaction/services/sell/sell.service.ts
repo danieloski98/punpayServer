@@ -7,10 +7,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosError } from 'axios';
 import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
-import { BankEntity } from 'src/bank/Entities/Bank.entity';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { SellDTO } from 'src/transaction/dto/sell.dto';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();

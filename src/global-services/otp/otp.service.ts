@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OTP_TYPE, TYPE_OF_OTP, getOtpType } from 'src/Enums/OTP_Type';
-import { AdminEntity } from 'src/admin-auth/Entities/Admin.entity';
-import { OtpEntity } from 'src/user-auth/Entity/Otp.entity';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { OtpEntity } from 'src/user-auth/Entity/otp.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 import { EmailService } from '../email/email.service';
 // eslint-disable-next-line @typescript-eslint/no-var-requires

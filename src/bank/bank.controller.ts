@@ -5,7 +5,7 @@ import { IBank } from '../types/banksModels';
 import { CreateBankDTO } from './DTO/createBankDTO';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { User } from 'src/decorators/user.decorator';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 
 @ApiTags('BANKS')

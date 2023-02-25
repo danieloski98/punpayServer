@@ -1,11 +1,11 @@
-import { RateEntity } from './Entities/Rate.entity';
-import { AdminEntity } from './admin-auth/Entities/Admin.entity';
-import { BankEntity } from './bank/Entities/Bank.entity';
-import { CoinEntity } from './coin/Entities/Coin.entity';
-import { OtpEntity } from './user-auth/Entity/Otp.entity';
-import { UserEntity } from './user-auth/Entity/User.entity';
-import { BalanceEntity } from './user/Entities/Balance.entity';
-import { NextOfKinEntity } from './user/Entities/NextofKin.entity';
+import { RateEntity } from './Entities/rate.entity';
+import { AdminEntity } from './admin-auth/Entities/admin.entity';
+import { BankEntity } from './bank/Entities/bank.entity';
+import { CoinEntity } from './coin/Entities/coin.entity';
+import { OtpEntity } from './user-auth/Entity/otp.entity';
+import { UserEntity } from './user-auth/Entity/user.entity';
+import { BalanceEntity } from './user/Entities/balance.entity';
+import { NextOfKinEntity } from './user/Entities/nextofKin.entity';
 
 const entities = [
   UserEntity,

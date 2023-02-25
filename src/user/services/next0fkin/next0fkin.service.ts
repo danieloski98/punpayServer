@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { CreateNextOfKinDTO } from 'src/user/DTO/CreateNextOfKinDTO';
-import { NextOfKinEntity } from 'src/user/Entities/NextofKin.entity';
+import { NextOfKinEntity } from 'src/user/Entities/nextofKin.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
