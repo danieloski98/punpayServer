@@ -1,6 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { Notification_Url } from 'src/UTILS/urls';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
 
 @Injectable()
 export class NotificationService {
@@ -8,8 +10,8 @@ export class NotificationService {
 
   async sendGeneralNotification(title: string, body: string) {
     const res = await this.httpService.axiosRef.post(Notification_Url, {
-      appId: 6405,
-      appToken: 'JhIbh6BDeO8Z5mEBHU50Dh',
+      appId: process.env.NATIVE_NOTIFY_ID,
+      appToken: process.env.NATIVE_NOTIFY_TOKEN,
       title,
       body,
       dateSent: new Date().toISOString(),
@@ -26,8 +28,8 @@ export class NotificationService {
       `https://app.nativenotify.com/api/indie/notification`,
       {
         subID: userId,
-        appId: 6405,
-        appToken: 'JhIbh6BDeO8Z5mEBHU50Dh',
+        appId: process.env.NATIVE_NOTIFY_ID,
+        appToken: process.env.NATIVE_NOTIFY_TOKEN,
         title,
         message: body,
       },
