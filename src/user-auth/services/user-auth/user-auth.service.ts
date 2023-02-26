@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmailService } from 'src/global-services/email/email.service';
 import { CreateAccountDTO } from 'src/user-auth/DTO/CreateAccountDTO';
 import { OtpEntity } from 'src/user-auth/Entity/otp.entity';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
 import { LoginDTO } from 'src/user-auth/DTO/LoginDTO';
