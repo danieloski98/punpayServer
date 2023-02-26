@@ -3,4 +3,5 @@ export enum TRANSACTION_TYPE {
   SELL,
   BUY,
   SWAP,
+  SEND,
 }
