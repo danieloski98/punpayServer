@@ -14,7 +14,7 @@ import { BuyDTO } from 'src/transaction/dto/Buy.dto';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { UserEntity } from 'src/user-auth/Entity/User.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 
 @Injectable()
 export class TransactionsService {
