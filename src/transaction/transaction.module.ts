@@ -9,7 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TransactionEntity } from './entities/transaction.entity';
 import { RateEntity } from 'src/Entities/rate.entity';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 
 @Module({
@@ -30,7 +30,6 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
     BuyService,
     SwapService,
     SendService,
-    // HttpService,
   ],
 })
 export class TransactionModule {}
