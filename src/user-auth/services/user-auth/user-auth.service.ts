@@ -68,21 +68,22 @@ export class UserAuthService {
       if (account !== null) {
         throw new BadRequestException('Email already in use');
       }
-      const data = await quidax.users.create({
-        email: user.email,
-        first_name: user.firstName,
-        last_name: user.lastName,
-      });
+      // const data = await quidax.users.create({
+      //   email: user.email,
+      //   first_name: user.firstName,
+      //   last_name: user.lastName,
+      // });
 
-      console.log(data);
+      // console.log(data);
 
-      if (data) {
+      if (account !== null) {
         // use the quidax id to create a new user
         const obj = {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          quidaxId: data.data.id,
+          quidaxId: 'bc5m64wl',
+          // quidaxId: data.data.id,
           password: user.password,
         };
         const newUser = await this.userRepo.create(obj).save();

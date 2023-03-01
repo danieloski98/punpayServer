@@ -5,6 +5,8 @@ import { SellDTO } from './dto/sell.dto';
 import { SendDTO } from './dto/send.dto';
 import { SendService } from './services/send/send.service';
 import { TransactionsService } from './services/transactions/transactions.service';
+import { BuyService } from './services/buy/buy.service';
+import { BuyDTO } from './dto/Buy.dto';
 
 @ApiTags('TRANSACTIONS')
 @Controller('transaction')
@@ -13,6 +15,7 @@ export class TransactionController {
     private sellService: SellService,
     private sendService: SendService,
     private transactionService: TransactionsService,
+    private buyService: BuyService,
   ) {}
 
   @ApiParam({ name: 'currency' })
@@ -56,6 +59,12 @@ export class TransactionController {
   @Post('sell')
   async createSellRequest(@Body() body: SellDTO) {
     return await this.sellService.sellCrypto(body);
+  }
+
+  @ApiBody({ type: BuyDTO })
+  @Post('buy')
+  async createBuyRequest(@Body() body: BuyDTO) {
+    return await this.buyService.initiateBuy(body);
   }
 
   @ApiBody({ type: SendDTO })

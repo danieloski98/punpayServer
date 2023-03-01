@@ -55,8 +55,8 @@ export class AdminAuthController {
   @UseGuards(AdminAuthGuard)
   @ApiBody({ type: ChangePassword })
   @Put('change-password')
-  chnagePassword(@Body() body: ChangePassword) {
-    return this.chnagePassword(body);
+  changePassword(@Body() body: ChangePassword) {
+    return this.crudService.changePassword(body);
   }
 
   @ApiTags('ADMIN-AUTH')
