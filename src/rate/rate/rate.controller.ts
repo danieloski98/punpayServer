@@ -30,11 +30,12 @@ export class RateController {
     return this.rateService.getRates();
   }
 
-  @Get(':currency')
+  @Get(':currency/:type')
   @ApiParam({ name: 'currency' })
+  @ApiParam({ name: 'type', description: 'it can either be buy or sell' })
   @ApiOkResponse({ type: ReadRateDto })
-  getRate(@Param('currency') param: any) {
-    return this.rateService.getRate(param);
+  getRate(@Param('currency') param: any, @Param('type') type: any) {
+    return this.rateService.getRate(param, type);
   }
 
   @Post('create')

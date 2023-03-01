@@ -26,12 +26,18 @@ export class RateService {
     };
   }
 
-  async getRate(currency: string) {
+  async getRate(currency: string, type: string) {
     if (!SUPPORTED_CURRENCY.includes(currency)) {
       throw new BadRequestException('Currency not supported');
     }
+
+    const arr = ['buy', 'sell'];
+
+    if (!arr.includes(type)) {
+      throw new BadRequestException('Invalid rate type');
+    }
     const currency_available = await this.rateRepo.findOne({
-      where: { currency },
+      where: { currency, type },
     });
 
     if (currency_available === null || currency_available === undefined) {
