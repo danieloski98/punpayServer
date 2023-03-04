@@ -20,29 +20,35 @@ export class BuyDTO {
   @IsNotEmpty()
   @ApiProperty()
   @Expose()
-  transaction_currency: string;
+  transactionCurrency: string;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
   @Expose()
-  transaction_amount: number;
+  transactionAmount: number;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
   @Expose()
-  payout_currency: string;
+  payoutCurrency: string;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
   @Expose()
-  payout_amount: number;
+  payoutAmount: number;
 
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
   @Expose()
   rate: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Expose()
+  transactionReference: string;
 }

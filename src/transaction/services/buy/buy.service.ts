@@ -20,15 +20,16 @@ export class BuyService {
   ) {}
 
   async initiateBuy(payload: BuyDTO) {
+    console.log(payload);
     if (
-      !SUPPORTED_CURRENCY.includes(payload.transaction_currency) ||
-      !SUPPORTED_CURRENCY.includes(payload.payout_currency)
+      !SUPPORTED_CURRENCY.includes(payload.transactionCurrency) ||
+      !SUPPORTED_CURRENCY.includes(payload.payoutCurrency)
     ) {
       throw new BadRequestException('Invalid currency');
     }
     // Get the rate of the currency
     const rate = await this.rateRepo.findOne({
-      where: { currency: payload.payout_currency, type: 'BUY' },
+      where: { currency: payload.payoutCurrency, type: 'BUY' },
     });
     if (rate === null) {
       throw new BadRequestException('Invalid Rate');

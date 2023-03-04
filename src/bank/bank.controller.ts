@@ -7,6 +7,7 @@ import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
+import { BankEntity } from './Entities/bank.entity';
 
 @ApiTags('BANKS')
 @Controller('bank')
@@ -17,6 +18,12 @@ export class BankController {
   @Get()
   getAllBanks() {
     return this.bankService.getBanks();
+  }
+
+  @ApiOkResponse({ type: BankEntity, isArray: true })
+  @Get('admin')
+  getAllAdminBanks() {
+    return this.bankService.getAdminAccounts();
   }
 
   @ApiOkResponse({ type: IBank })

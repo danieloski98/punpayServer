@@ -10,6 +10,7 @@ import { withDrawalSuccessful } from 'src/types/withdrawalApproved';
 import { WithdrawalRejected } from 'src/types/withdrawalRejected';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class WebhookService {
@@ -54,7 +55,7 @@ export class WebhookService {
       this.notificationService.sendIndieNotification(
         transaction.userId,
         'Withdrawal successfull',
-        `Transaction with ID-${transaction.id} failed, please try again`,
+        `Transaction with ID-${transaction.id} was succesful`,
       );
     }
   }
@@ -76,6 +77,7 @@ export class WebhookService {
           quidaxTransactionId: body.data.id,
           status: TRANSACTION_STATUS.PAID,
           transactionType: TRANSACTION_TYPE.RECIEVED,
+          transactionReference: randomUUID(),
         })
         .save();
       await this.notificationService.sendIndieNotification(

@@ -10,3 +10,5 @@ export const SUPPORTED_CURRENCY = [
   'ngn',
   'usd',
 ];
+
+export const RATE_CURRENCY = ['usd'];

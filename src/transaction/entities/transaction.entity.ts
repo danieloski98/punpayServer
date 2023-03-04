@@ -14,7 +14,7 @@ export class TransactionEntity extends BaseEntity {
   @Column({ type: 'text', nullable: false })
   userId: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   quidaxTransactionId: string;
 
   @Column({ type: 'int', nullable: false })
@@ -23,34 +23,37 @@ export class TransactionEntity extends BaseEntity {
   @Column({ type: 'varchar', nullable: true })
   bankId: string;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', nullable: false })
   transactionCurrency: string;
 
-  @Column({ type: 'float', nullable: true })
+  @Column({ type: 'float', nullable: false })
   transactionAmount: number;
 
   @Column({ type: 'int', nullable: true })
   rate: number;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: true })
   currencyRate: number;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: true })
   payoutCurrency: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'text', nullable: true })
   hash: string;
 
-  @Column({ type: 'float', nullable: false })
+  @Column({ type: 'float', nullable: true })
   payoutAamount: number;
 
-  @Column({ type: 'simple-array', nullable: false })
+  @Column({ type: 'simple-array', nullable: true })
   images: string[];
 
   @Column({ type: 'text', nullable: false })
+  transactionReference: string;
+
+  @Column({ type: 'text', nullable: true })
   withdrawalAddress: string;
 
-  @Column({ type: 'int', nullable: false })
+  @Column({ type: 'int', nullable: true })
   status: number;
 
   @Column({

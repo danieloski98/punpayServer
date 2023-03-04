@@ -10,11 +10,13 @@ export class CreateBankDTO {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  name: string;
+  bankname: string;
 
   @IsNotEmpty()
   @IsString()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'this is the code u get from calling the /bank endpoint',
+  })
   code: string;
 
   @IsNotEmpty()

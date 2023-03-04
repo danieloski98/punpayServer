@@ -49,7 +49,7 @@ export class OtpService {
         .create({ userId: user.id, code, type: getOtpType(otpType) })
         .save();
       const timeOut = setTimeout(async () => {
-        await this.otpRepo.update({ id: otp.id }, { expired: true });
+        await this.otpRepo.update({ id: newotp.id }, { expired: true });
         this.logger.debug('OTP cleared!!!');
         clearTimeout(timeOut);
       }, 1000 * 60);
@@ -90,6 +90,20 @@ export class OtpService {
 
     return {
       message: 'OTP sent!',
+    };
+  }
+
+  async verifyUserOtp(id: string, code: number, type: TYPE_OF_OTP) {
+    const otp = await this.otpRepo.findOne({
+      where: { userId: id, code, type: getOtpType(type) },
+    });
+    if (otp === null || otp.expired) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    // Deleting the oTP
+    await this.otpRepo.update({ id: otp.id }, { expired: true });
+    return {
+      message: 'OTP valid',
     };
   }
 

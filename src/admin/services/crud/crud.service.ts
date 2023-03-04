@@ -31,8 +31,11 @@ export class CrudService {
     }
     // Update the details
     await this.adminRepo.update({ id }, payload);
+
+    const updatedAdmin = await this.adminRepo.findOne({ where: { id } });
     return {
       messgae: 'Details updated',
+      data: updatedAdmin,
     };
   }
 

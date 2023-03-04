@@ -18,6 +18,8 @@ import { CrudService } from './services/crud/crud.service';
 import { Next0fkinService } from './services/next0fkin/next0fkin.service';
 import { WalletService } from './services/wallet/wallet.service';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
+import { OtpService } from 'src/global-services/otp/otp.service';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 
 export interface IUser {
   id: string;
@@ -32,6 +34,7 @@ export class UserController {
     private nextofkinService: Next0fkinService,
     private balanceService: BalanceService,
     private walletService: WalletService,
+    private otpService: OtpService,
   ) {}
 
   @ApiTags('USER')
@@ -54,6 +57,26 @@ export class UserController {
   @Get('')
   getUser() {
     return this.crudService.getAllUsers();
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiTags('USER')
+  @Get('request-otp')
+  requestotp(@User() user: UserEntity) {
+    return this.otpService.generateOtp(user.id, 'USER', 'PAYMENT_VERIFICATION');
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiTags('USER')
+  @ApiBody({ type: ChangePasswordDTO })
+  @ApiParam({ name: 'code' })
+  @Get('verify-otp/:code')
+  verifyotp(@Param('code') code: string, @User() user: UserEntity) {
+    return this.otpService.verifyUserOtp(
+      user.id,
+      parseInt(code),
+      'PAYMENT_VERIFICATION',
+    );
   }
 
   @UseGuards(AuthorizationGuard)

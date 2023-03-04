@@ -12,6 +12,7 @@ import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
+import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 
 @Injectable()
 export class SendService {
@@ -76,11 +77,13 @@ export class SendService {
           quidaxTransactionId: response.data.data.id,
           transactionType: TRANSACTION_TYPE.SEND,
           hash: response.data.data.txid,
+          status: TRANSACTION_STATUS.PROCESSING,
         })
         .save();
       console.log(transaction);
       return {
-        ...response.data,
+        data: transaction,
+        // ...response.data,
       };
     } catch (error) {
       throw new InternalServerErrorException(error.response.data.message);

@@ -105,6 +105,18 @@ export class TransactionsService {
     };
   }
 
+  async getTransactionsByReferenc(reference: string) {
+    const transaction = await this.transactionRepo.find({
+      where: { transactionReference: reference },
+    });
+    if (transaction === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+    return {
+      data: transaction,
+    };
+  }
+
   /**
    * ADMIN METHODS
    */

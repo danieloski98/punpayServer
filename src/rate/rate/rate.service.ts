@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RateEntity } from 'src/Entities/rate.entity';
 import { Repository } from 'typeorm';
 import { CreateRateDto } from '../dto/createrate.dto';
-import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
+import { RATE_CURRENCY, SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 
 @Injectable()
 export class RateService {
@@ -27,7 +27,7 @@ export class RateService {
   }
 
   async getRate(currency: string, type: string) {
-    if (!SUPPORTED_CURRENCY.includes(currency)) {
+    if (!RATE_CURRENCY.includes(currency)) {
       throw new BadRequestException('Currency not supported');
     }
 
@@ -53,7 +53,7 @@ export class RateService {
   }
 
   async createRate(payload: CreateRateDto) {
-    if (!SUPPORTED_CURRENCY.includes(payload.currency)) {
+    if (!RATE_CURRENCY.includes(payload.currency)) {
       throw new BadRequestException('Currency not supported');
     }
     const exists = await this.rateRepo.findOne({

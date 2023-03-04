@@ -8,6 +8,8 @@ import { WalletService } from './services/wallet/wallet.service';
 import { CrudService as AdminService } from '../admin/services/crud/crud.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { OtpService } from 'src/global-services/otp/otp.service';
+import { EmailService } from 'src/global-services/email/email.service';
 
 @Module({
   imports: [UserAuthModule, TypeOrmModule.forFeature([AdminEntity])],
@@ -18,6 +20,8 @@ import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
     BalanceService,
     WalletService,
     AdminService,
+    OtpService,
+    EmailService,
   ],
 })
 export class UserModule {}

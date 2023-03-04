@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBankDTO } from 'src/bank/DTO/createBankDTO';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
@@ -105,7 +105,7 @@ export class BanksService {
         { id: hasBank.id },
         {
           bankId: bank.id,
-          name: bank.name,
+          name: bank.bankname,
           code: bank.code,
           accountName: data.data.account_name,
           accountNumber: data.data.account_number,
@@ -146,12 +146,13 @@ export class BanksService {
       const newBank = await this.bankRepo
         .create({
           bankId: payload.id,
-          name: payload.name,
+          name: payload.bankname,
           code: payload.code,
           accountName: data.data.account_name,
           accountNumber: data.data.account_number,
           userId,
           isLinked: true,
+          isAdminAccount: false,
         })
         .save();
 
@@ -176,10 +177,20 @@ export class BanksService {
         { headers: { Authorization: `Bearer ${process.env.PSSK}` } },
       );
       // create new Bank
+      const bankExist = await this.bankRepo.findOne({
+        where: {
+          isAdminAccount: true,
+          accountNumber: data.data.account_number,
+        },
+      });
+      if (bankExist !== null) {
+        throw new BadRequestException('Bank already exist');
+      }
+      console.log(data.data);
       const newBank = await this.bankRepo
         .create({
           bankId: payload.id,
-          name: payload.name,
+          name: payload.bankname,
           code: payload.code,
           accountName: data.data.account_name,
           accountNumber: data.data.account_number,
@@ -199,5 +210,12 @@ export class BanksService {
         'An error occured while verifying account number',
       );
     }
+  }
+
+  async getAdminAccounts() {
+    const banks = await this.bankRepo.find({ where: { isAdminAccount: true } });
+    return {
+      data: banks,
+    };
   }
 }

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import {
   BaseEntity,
@@ -11,33 +12,43 @@ import {
 
 @Entity('Bank')
 export class BankEntity extends BaseEntity {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', nullable: true })
   userId: string;
 
+  @ApiProperty()
   @Column({ type: 'int', nullable: false })
   bankId: number;
 
+  @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   code: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   accountNumber: string;
 
+  @ApiProperty()
   @Column({ type: 'varchar', nullable: false })
   accountName: string;
 
+  @ApiProperty()
   @Column({ type: 'bool', default: false })
   isLinked: boolean;
 
+  @ApiProperty()
   @Column({ type: 'bool', default: false })
   isAdminAccount: boolean;
 
+  @ApiProperty()
   @Column({
     type: 'varchar',
     nullable: false,
@@ -45,6 +56,7 @@ export class BankEntity extends BaseEntity {
   })
   createdAt: string;
 
+  @ApiProperty()
   @Column({
     type: 'varchar',
     nullable: false,
