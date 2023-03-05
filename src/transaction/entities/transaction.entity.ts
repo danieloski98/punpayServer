@@ -42,7 +42,7 @@ export class TransactionEntity extends BaseEntity {
   hash: string;
 
   @Column({ type: 'float', nullable: true })
-  payoutAamount: number;
+  payoutAmount: number;
 
   @Column({ type: 'simple-array', nullable: true })
   images: string[];
