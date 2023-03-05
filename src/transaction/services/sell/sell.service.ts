@@ -57,39 +57,39 @@ export class SellService {
         throw new BadRequestException('Currency not supported');
       }
       // get ths admin currency
-      // const currency = await this.fetchAdminAddress(
-      //   payload.transaction_currency,
-      // );
-      // console.log(currency);
+      const currency = await this.fetchAdminAddress(
+        payload.transactionCurrency,
+      );
+      console.log(currency);
       if (true) {
         // create the transaction on quidax
         try {
-          // const response = await this.httpService.axiosRef.post(
-          //   `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
-          //   {
-          //     currency: payload.transaction_currency,
-          //     amount: payload.transaction_amount,
-          //     fund_uid: currency.data.address,
-          //     transaction_note: `Payment of ${payload.transaction_amount}-${payload.transaction_currency}`,
-          //   },
-          //   {
-          //     headers: {
-          //       authorization: `Bearer ${process.env.QDX_SECRET}`,
-          //     },
-          //   },
-          // );
+          const response = await this.httpService.axiosRef.post(
+            `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
+            {
+              currency: payload.transactionCurrency,
+              amount: payload.transactionAmount,
+              fund_uid: currency.data.address,
+              transaction_note: `Payment of ${payload.transactionAmount}-${payload.transactionCurrency}`,
+            },
+            {
+              headers: {
+                authorization: `Bearer ${process.env.QDX_SECRET}`,
+              },
+            },
+          );
           // create the withdrawal in the database
           const transaction = await this.transactionRepo
             .create({
               ...payload,
-              quidaxTransactionId: 'ednew30h203h3r',
-              //quidaxTransactionId: response.data.data.id,
+              // quidaxTransactionId: 'ednew30h203h3r',
+              quidaxTransactionId: response.data.data.id,
               transactionType: TRANSACTION_TYPE.SELL,
               transactionReference: randomUUID(),
-              withdrawalAddress: 'lrfnrfwnfowfowebfefbwoefbwf',
-              // withdrawalAddress: currency.data.address,
-              hash: 'odbodb3br23b023r2',
-              //hash: response.data.data.txid,
+              // withdrawalAddress: 'lrfnrfwnfowfowebfefbwoefbwf',
+              withdrawalAddress: currency.data.address,
+              //hash: 'odbodb3br23b023r2',
+              hash: response.data.data.txid,
               status: TRANSACTION_STATUS.PROCESSING,
             })
             .save();
@@ -100,8 +100,8 @@ export class SellService {
           };
         } catch (error: any) {
           const err = error as AxiosError<any, any>;
-          throw new InternalServerErrorException(error.message);
-          //throw new InternalServerErrorException(error.response.data.message);
+          //throw new InternalServerErrorException(error.message);
+          throw new InternalServerErrorException(error.response.data.message);
         }
       }
     } catch (error: any) {

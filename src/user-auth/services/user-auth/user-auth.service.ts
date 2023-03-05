@@ -113,7 +113,7 @@ export class UserAuthService {
           await this.otpRepo.update({ id: otp.id }, { expired: true });
           this.logger.debug('OTP cleared!!!');
           clearTimeout(timeOut);
-        }, 10000 * 60);
+        }, 100000 * 60);
         // await this.coinService.createCoinsForUser(newUser.id);
         const email = await this.emailService.sendConfirmationEmail(
           user.email,
