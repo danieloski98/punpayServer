@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateAccountDTO } from './DTO/CreateAccountDTO';
 import { LoginDTO } from './DTO/LoginDTO';
@@ -7,6 +15,8 @@ import { UserAuthService } from './services/user-auth/user-auth.service';
 import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from './Entity/user.entity';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
+import { PinDTO } from './DTO/pin.dto';
+import { UpdatePinDTO } from './DTO/Updatepin.dto';
 
 @Controller('user-auth')
 @ApiTags('USER-AUTH')
@@ -54,6 +64,27 @@ export class UserAuthController {
   @Post('reset-password')
   Resetpassword(@Body() body: PasswordResetDTO) {
     return this.userService.resetPassword(body);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiBody({ type: PinDTO })
+  @Post('create-pin')
+  createpin(@Body() body: PinDTO) {
+    return this.userService.createPin(body);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiBody({ type: UpdatePinDTO })
+  @Put('update-pin')
+  updatepin(@Body() body: UpdatePinDTO) {
+    return this.userService.updatePin(body);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiBody({ type: PinDTO })
+  @Put('verify-pin')
+  verifypin(@Body() body: PinDTO) {
+    return this.userService.verifyPin(body);
   }
 
   @UseGuards(AuthorizationGuard)

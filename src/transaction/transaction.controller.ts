@@ -7,6 +7,8 @@ import { SendService } from './services/send/send.service';
 import { TransactionsService } from './services/transactions/transactions.service';
 import { BuyService } from './services/buy/buy.service';
 import { BuyDTO } from './dto/Buy.dto';
+import { SwapService } from './services/swap/swap.service';
+import { SwapDTO } from './dto/swap.dto';
 
 @ApiTags('TRANSACTIONS')
 @Controller('transaction')
@@ -16,6 +18,7 @@ export class TransactionController {
     private sendService: SendService,
     private transactionService: TransactionsService,
     private buyService: BuyService,
+    private swapService: SwapService,
   ) {}
 
   @ApiParam({ name: 'currency' })
@@ -80,6 +83,13 @@ export class TransactionController {
   async withdrawRequest(@Body() body: SendDTO) {
     console.log(body);
     return await this.sendService.sendCrypto(body);
+  }
+
+  @ApiBody({ type: SwapDTO })
+  @Post('swap')
+  async swapRequest(@Body() body: SwapDTO) {
+    console.log(body);
+    return await this.swapService.swapTransaction(body);
   }
 
   @ApiParam({ name: 'transactionId' })
