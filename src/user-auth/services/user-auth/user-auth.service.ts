@@ -30,6 +30,8 @@ const axios = require('axios');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import {} from '@nestjs/axios';
 import { quidax } from 'src/UTILS/quidax';
+import { PinDTO } from 'src/user-auth/DTO/pin.dto';
+import { UpdatePinDTO } from 'src/user-auth/DTO/Updatepin.dto';
 
 type Customer = {
   customer: {
@@ -308,6 +310,53 @@ export class UserAuthService {
     return {
       message: usr,
       data: usr,
+    };
+  }
+
+  async createPin(payload: PinDTO) {
+    const user = await this.userRepo.findOne({ where: { id: payload.userId } });
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.pin !== '') {
+      throw new BadRequestException('Already have a pin, update instead');
+    }
+    const salt = await genSalt();
+    const pinhash = await hash(payload.pin, salt);
+    await this.userRepo.update({ id: payload.userId }, { pin: pinhash });
+    return {
+      message: 'Pin created',
+    };
+  }
+
+  async updatePin(payload: UpdatePinDTO) {
+    const user = await this.userRepo.findOne({ where: { id: payload.userId } });
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+    const match = await compare(payload.oldpin, user.pin);
+    if (!match) {
+      throw new BadRequestException('invalid old PIN');
+    }
+    const salt = await genSalt();
+    const pinhash = await hash(payload.pin, salt);
+    await this.userRepo.update({ id: payload.userId }, { pin: pinhash });
+    return {
+      message: 'Pin created',
+    };
+  }
+
+  async verifyPin(payload: PinDTO) {
+    const user = await this.userRepo.findOne({ where: { id: payload.userId } });
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+    const match = await compare(payload.pin, user.pin);
+    if (!match) {
+      throw new BadRequestException('Invalid Pin');
+    }
+    return {
+      message: 'Pin match',
     };
   }
 }

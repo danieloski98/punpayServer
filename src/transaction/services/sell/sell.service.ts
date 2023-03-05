@@ -6,12 +6,15 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosError } from 'axios';
+import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { SellDTO } from 'src/transaction/dto/sell.dto';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'crypto';
+import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -80,11 +83,17 @@ export class SellService {
             .create({
               ...payload,
               quidaxTransactionId: response.data.data.id,
+              transactionType: TRANSACTION_TYPE.SELL,
+              transactionReference: randomUUID(),
+              withdrawalAddress: currency.data.address,
+              hash: response.data.data.txid,
+              status: TRANSACTION_STATUS.PROCESSING,
             })
             .save();
           console.log(transaction);
           return {
-            ...response.data,
+            message: 'Transaction is processing',
+            data: transaction,
           };
         } catch (error: any) {
           const err = error as AxiosError<any, any>;
