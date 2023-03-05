@@ -78,7 +78,9 @@ export class UserAuthService {
 
       // console.log(data);
 
-      if (account !== null) {
+      console.log(`This is from acount creation`);
+
+      if (account === null) {
         // use the quidax id to create a new user
         const obj = {
           firstName: user.firstName,
@@ -90,7 +92,7 @@ export class UserAuthService {
         };
         const newUser = await this.userRepo.create(obj).save();
         // create balance
-        await this.balanceRepo.create({ userId: newUser.id }).save();
+        // await this.balanceRepo.create({ userId: newUser.id }).save();
         // create wallets for user
         // send email
         // generate code
@@ -112,7 +114,7 @@ export class UserAuthService {
           this.logger.debug('OTP cleared!!!');
           clearTimeout(timeOut);
         }, 10000 * 60);
-        await this.coinService.createCoinsForUser(newUser.id);
+        // await this.coinService.createCoinsForUser(newUser.id);
         const email = await this.emailService.sendConfirmationEmail(
           user.email,
           code,
@@ -125,6 +127,7 @@ export class UserAuthService {
             algorithm: 'HS256',
           },
         );
+        console.log(`this is the token - ${token}`);
         delete newUser.password;
         return {
           message: 'Account created successfully',
@@ -318,7 +321,8 @@ export class UserAuthService {
     if (user === null) {
       throw new BadRequestException('User not found');
     }
-    if (user.pin !== '') {
+    console.log(user.pin);
+    if (user.pin !== null) {
       throw new BadRequestException('Already have a pin, update instead');
     }
     const salt = await genSalt();

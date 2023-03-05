@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { SellService } from './services/sell/sell.service';
 import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
 import { SellDTO } from './dto/sell.dto';
@@ -9,6 +17,9 @@ import { BuyService } from './services/buy/buy.service';
 import { BuyDTO } from './dto/Buy.dto';
 import { SwapService } from './services/swap/swap.service';
 import { SwapDTO } from './dto/swap.dto';
+import { AuthorizationGuard } from 'src/guards/authorization.guard';
+import { User } from 'src/decorators/user.decorator';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 
 @ApiTags('TRANSACTIONS')
 @Controller('transaction')
@@ -58,6 +69,21 @@ export class TransactionController {
   @Get('user/:reference')
   getUserTransactionbyReference(@Param('reference') param: string) {
     return this.transactionService.getTransactionsByReferenc(param);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiParam({
+    name: 'reference',
+  })
+  @Get('user/coin/:currency')
+  getUserTransactionbyCurrency(
+    @Param('currency') param: string,
+    @User() user: UserEntity,
+  ) {
+    return this.transactionService.getTransactionsForPaticularCoin(
+      user.id,
+      param,
+    );
   }
 
   @ApiParam({ name: 'currency' })

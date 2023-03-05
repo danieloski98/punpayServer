@@ -38,34 +38,37 @@ export class SwapService {
       throw new BadRequestException('Currency not supported');
     }
     // get ths admin currency
-    const currency = await this.sellService.fetchAdminAddress(
-      payload.payoutCurrency,
-    );
+    // const currency = await this.sellService.fetchAdminAddress(
+    //   payload.payoutCurrency,
+    // );
     // create the transaction on quidax
     try {
-      const response = await this.httpService.axiosRef.post(
-        `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
-        {
-          currency: payload.transactionCurrency,
-          amount: payload.transactionAmount,
-          fund_uid: currency.data.address,
-          transaction_note: `Payment of ${payload.transactionAmount}-${payload.transactionCurrency}`,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${process.env.QDX_SECRET}`,
-          },
-        },
-      );
+      // const response = await this.httpService.axiosRef.post(
+      //   `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
+      //   {
+      //     currency: payload.transactionCurrency,
+      //     amount: payload.transactionAmount,
+      //     fund_uid: currency.data.address,
+      //     transaction_note: `Payment of ${payload.transactionAmount}-${payload.transactionCurrency}`,
+      //   },
+      //   {
+      //     headers: {
+      //       authorization: `Bearer ${process.env.QDX_SECRET}`,
+      //     },
+      //   },
+      // );
       // create the withdrawal in the database
       const transaction = await this.transactionRepo
         .create({
           ...payload,
-          quidaxTransactionId: response.data.data.id,
+          quidaxTransactionId: 'edneodnowefnowef',
+          //quidaxTransactionId: response.data.data.id,
           transactionType: TRANSACTION_TYPE.SWAP,
           transactionReference: randomUUID(),
-          withdrawalAddress: currency.data.address,
-          hash: response.data.data.txid,
+          withdrawalAddress: 'efwefwefwfe',
+          //withdrawalAddress: currency.data.address,
+          hash: 'depindwefnowefnw',
+          //hash: response.data.data.txid,
           status: TRANSACTION_STATUS.PROCESSING,
         })
         .save();
@@ -76,7 +79,8 @@ export class SwapService {
       };
     } catch (error: any) {
       const err = error as AxiosError<any, any>;
-      throw new InternalServerErrorException(err.response.data.message);
+      throw new InternalServerErrorException(error.message);
+      //throw new InternalServerErrorException(error.response.data.message);
     }
   }
 }
