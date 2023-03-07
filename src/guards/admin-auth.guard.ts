@@ -14,7 +14,6 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class AdminAuthGuard implements CanActivate {
   private logger = new Logger('AuthGuard');
-  constructor(private adminService: CrudService) {}
   async canActivate(context: ExecutionContext) {
     try {
       const http = context.switchToHttp().getRequest() as Request;
@@ -26,7 +25,7 @@ export class AdminAuthGuard implements CanActivate {
       this.logger.warn(token);
       const val = verify(token, process.env.JWT_KEY);
       console.log(val);
-      const admin = await this.adminService.getAdminById(val['id']);
+      // const admin = await this.adminService.getAdminById(val['id']);
       // if (admin === undefined) {
       //   throw new UnauthorizedException('Not authorized');
       // }
