@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { BanksService } from './services/banks/banks.service';
-import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import { IBank } from '../types/banksModels';
 import { CreateBankDTO } from './DTO/createBankDTO';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
@@ -8,6 +17,7 @@ import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 import { BankEntity } from './Entities/bank.entity';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 
 @ApiTags('BANKS')
 @Controller('bank')
@@ -66,5 +76,19 @@ export class BankController {
   @Put('update')
   updatebank(@Body() body: CreateBankDTO, @User() user: UserEntity) {
     return this.bankService.unpdateBank(user.id, body);
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @ApiBody({ type: CreateBankDTO })
+  @Put('admin/update')
+  updateadminaccount(@Body() body: CreateBankDTO, @User() user: AdminEntity) {
+    return this.bankService.updatedAdminAccount(user.id, body);
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @ApiParam({ name: 'id' })
+  @Delete('admin/:id')
+  deleteAdminBank(@User() admin: AdminEntity, @Param('id') id: string) {
+    return this.bankService.deleteAdminBank(id);
   }
 }

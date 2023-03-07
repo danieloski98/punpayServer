@@ -27,10 +27,10 @@ export class AdminAuthGuard implements CanActivate {
       const val = verify(token, process.env.JWT_KEY);
       console.log(val);
       const admin = await this.adminService.getAdminById(val['id']);
-      // if (admin. === undefined) {
+      // if (admin === undefined) {
       //   throw new UnauthorizedException('Not authorized');
       // }
-      // this.logger.verbose(val);
+      this.logger.verbose(val);
       http['user'] = val;
       return true;
     } catch (error) {

@@ -218,4 +218,47 @@ export class BanksService {
       data: banks,
     };
   }
+
+  async updatedAdminAccount(bankId: string, payload: CreateBankDTO) {
+    // reslove ths account
+    const { data } = await this.httpService.axiosRef.get(
+      `https://api.paystack.co/bank/resolve?account_number=${payload.accountNumber}&bank_code=${payload.code}`,
+      { headers: { Authorization: `Bearer ${process.env.PSSK}` } },
+    );
+    // create new Bank
+    const bankExist = await this.bankRepo.findOne({
+      where: {
+        isAdminAccount: true,
+        id: bankId,
+      },
+    });
+    if (bankExist !== null) {
+      throw new BadRequestException('Bank already exist');
+    }
+    // update the bank
+    await this.bankRepo.update(
+      { id: bankId },
+      {
+        bankId: payload.id,
+        name: payload.bankname,
+        code: payload.code,
+        accountName: data.data.account_name,
+        accountNumber: data.data.account_number,
+      },
+    );
+    return {
+      message: 'Bank Updated',
+    };
+  }
+
+  async deleteAdminBank(id: string) {
+    const bank = await this.bankRepo.findOne({ where: { id } });
+    if (bank === null) {
+      throw new BadRequestException('Bank not found');
+    }
+    await this.bankRepo.delete({ id });
+    return {
+      message: 'Bank Deleted',
+    };
+  }
 }
