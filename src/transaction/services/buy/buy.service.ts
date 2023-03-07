@@ -28,12 +28,12 @@ export class BuyService {
       throw new BadRequestException('Invalid currency');
     }
     // Get the rate of the currency
-    const rate = await this.rateRepo.findOne({
-      where: { currency: payload.payoutCurrency, type: 'BUY' },
-    });
-    if (rate === null) {
-      throw new BadRequestException('Invalid Rate');
-    }
+    // const rate = await this.rateRepo.findOne({
+    //   where: { currency: payload.payoutCurrency, type: 'BUY' },
+    // });
+    // if (rate === null) {
+    //   throw new BadRequestException('Invalid Rate');
+    // }
     // create the transaction
     const transaction = await this.transactionRepo
       .create({
