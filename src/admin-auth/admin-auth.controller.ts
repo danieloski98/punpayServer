@@ -52,7 +52,7 @@ export class AdminAuthController {
   }
 
   @ApiTags('ADMIN-AUTH')
-  @UseGuards(AdminAuthGuard)
+  @UseGuards(new AdminAuthGuard())
   @ApiBody({ type: ChangePassword })
   @Put('change-password')
   changePassword(@Body() body: ChangePassword) {
