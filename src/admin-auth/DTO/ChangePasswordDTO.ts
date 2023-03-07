@@ -5,7 +5,6 @@ export class ChangePassword {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  @MinLength(5)
   otp: number;
 
   @ApiProperty()

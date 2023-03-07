@@ -16,12 +16,12 @@ export class UpdateAdminDto {
   @ApiProperty()
   fullname: string;
 
-  @IsString()
-  @IsOptional()
-  @IsEmail()
-  @Expose()
-  @ApiProperty()
-  email: string;
+  // @IsString()
+  // @IsOptional()
+  // @IsEmail()
+  // @Expose()
+  // @ApiProperty()
+  // email: string;
 
   @IsString()
   @IsOptional()
