@@ -5,6 +5,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { SellService } from './services/sell/sell.service';
@@ -79,7 +80,15 @@ export class TransactionController {
   getUserTransactionbyCurrency(
     @Param('currency') param: string,
     @User() user: UserEntity,
+    @Query('type') type: string,
   ) {
+    if (+type >= 0) {
+      return this.transactionService.getTransactionsForPaticularCoin(
+        user.id,
+        param,
+        +type,
+      );
+    }
     return this.transactionService.getTransactionsForPaticularCoin(
       user.id,
       param,

@@ -80,9 +80,10 @@ export class BankController {
 
   @UseGuards(AdminAuthGuard)
   @ApiBody({ type: CreateBankDTO })
-  @Put('admin/update')
-  updateadminaccount(@Body() body: CreateBankDTO, @User() user: AdminEntity) {
-    return this.bankService.updatedAdminAccount(user.id, body);
+  @ApiParam({ name: 'id' })
+  @Put('admin/update/:id')
+  updateadminaccount(@Body() body: CreateBankDTO, @Param('id') param: string) {
+    return this.bankService.updatedAdminAccount(param, body);
   }
 
   @UseGuards(AdminAuthGuard)

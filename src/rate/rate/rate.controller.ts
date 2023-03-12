@@ -45,11 +45,11 @@ export class RateController {
     return this.rateService.createRate(body);
   }
 
-  @Put(':id/:rate')
+  @Put(':id/:amount')
   @ApiParam({ name: 'id' })
-  @ApiParam({ name: 'rate' })
+  @ApiParam({ name: 'amount', description: '' })
   @ApiOkResponse({ type: UpdateRateDto })
-  updateCoin(@Param('id') param: any, @Param('rate') rate: any) {
+  updateCoin(@Param('id') param: any, @Param('amount') rate: any) {
     return this.rateService.updateRate(param, +rate);
   }
 
