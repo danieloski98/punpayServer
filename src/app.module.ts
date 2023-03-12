@@ -18,6 +18,7 @@ import { NotificationService } from './global-services/notification/notification
 import { HttpModule } from '@nestjs/axios';
 import { dataSourceOptions } from 'db/data-source';
 import { WebhookModule } from './webhook/webhook.module';
+import { VerificationModule } from './verification/verification.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { WebhookModule } from './webhook/webhook.module';
     TransactionModule,
     AdminModule,
     WebhookModule,
+    VerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService, EmailService, NotificationService],

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
+import { Verification } from 'src/verification/verification.entity';
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
@@ -60,4 +61,7 @@ export class UserEntity extends BaseEntity {
   // Relationships
   @OneToOne(() => BankEntity, (bank) => bank.user)
   bank: BankEntity;
+
+  @OneToOne(() => Verification, (verification) => verification.user)
+  verification: Verification;
 }
