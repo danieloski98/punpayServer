@@ -92,7 +92,24 @@ export class TransactionsService {
     };
   }
 
-  async getTransactionsForPaticularCoin(userId: string, currency: string) {
+  async getTransactionsForPaticularCoin(
+    userId: string,
+    currency: string,
+    type: number = undefined,
+  ) {
+    console.log(type);
+    if (type !== undefined) {
+      const transactions = await this.transactionRepo.find({
+        where: [
+          { userId, payoutCurrency: currency, transactionType: type },
+          { userId, transactionCurrency: currency, transactionType: type },
+        ],
+      });
+      const newTransactions = _.uniq(transactions);
+      return {
+        data: newTransactions,
+      };
+    }
     const transactions = await this.transactionRepo.find({
       where: [
         { userId, payoutCurrency: currency },
