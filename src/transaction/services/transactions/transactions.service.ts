@@ -15,6 +15,7 @@ import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 
 @Injectable()
 export class TransactionsService {
@@ -148,8 +149,32 @@ export class TransactionsService {
   }
 
   async getTransactions(type: number) {
+    if (type === TRANSACTION_TYPE.BUY) {
+      const trx = await this.transactionRepo.find({
+        where: { transactionType: type },
+        relations: ['user', 'user.bank'],
+      });
+      return { data: trx };
+    }
+    if (type === TRANSACTION_TYPE.SELL || type === TRANSACTION_TYPE.SWAP) {
+      const trx = await this.transactionRepo.find({
+        where: { transactionType: type },
+        relations: ['user'],
+      });
+      // get wallet address
+      return { data: trx };
+    }
     const trx = await this.transactionRepo.find({
       where: { transactionType: type },
+    });
+    return {
+      data: trx,
+    };
+  }
+
+  async getAllTransactions() {
+    const trx = await this.transactionRepo.find({
+      relations: ['user'],
     });
     return {
       data: trx,

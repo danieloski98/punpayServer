@@ -1,8 +1,13 @@
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import {
   BaseEntity,
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -14,14 +19,20 @@ export class TransactionEntity extends BaseEntity {
   @Column({ type: 'text', nullable: false })
   userId: string;
 
+  @Column({ type: 'text', nullable: true })
+  adminId: string;
+
   @Column({ type: 'varchar', nullable: true })
   quidaxTransactionId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  adminQuidaxTransactionId: string;
 
   @Column({ type: 'int', nullable: false })
   transactionType: number;
 
-  @Column({ type: 'varchar', nullable: true })
-  bankId: string;
+  @Column({ type: 'int', nullable: true })
+  bankId: number;
 
   @Column({ type: 'varchar', nullable: false })
   transactionCurrency: string;
@@ -74,4 +85,19 @@ export class TransactionEntity extends BaseEntity {
   async update() {
     this.updatedAt = new Date().toISOString();
   }
+
+  // relationships
+  @ManyToOne(() => UserEntity, (user) => user.transactions, {
+    cascade: ['insert', 'remove', 'update'],
+  })
+  @JoinColumn({ referencedColumnName: 'id', name: 'userId' })
+  user: UserEntity;
+
+  @ManyToOne(() => AdminEntity, (admin) => admin.transactions)
+  @JoinColumn({ referencedColumnName: 'id', name: 'adminId' })
+  admin: AdminEntity;
+
+  @ManyToOne(() => BankEntity, (bank) => bank.transactions)
+  @JoinColumn({ referencedColumnName: 'id', name: 'bankId' })
+  adminBank: BankEntity;
 }

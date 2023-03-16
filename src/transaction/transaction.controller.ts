@@ -21,6 +21,8 @@ import { SwapDTO } from './dto/swap.dto';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 
 @ApiTags('TRANSACTIONS')
 @Controller('transaction')
@@ -33,12 +35,14 @@ export class TransactionController {
     private swapService: SwapService,
   ) {}
 
+  @UseGuards(new AdminAuthGuard())
   @ApiParam({ name: 'currency' })
   @Get('admin/wallet/:currency')
   getAdminWalletAddress(@Param('currency') param: string) {
     return this.sellService.fetchAdminAddress(param);
   }
 
+  @UseGuards(new AdminAuthGuard())
   @ApiParam({
     name: 'type',
     description: '0 = Deposit, 1=SELL, 2=BUY, 3=SWAP, 4=SEND',
@@ -48,6 +52,13 @@ export class TransactionController {
     return this.transactionService.getTransactions(+param);
   }
 
+  @UseGuards(new AdminAuthGuard())
+  @Get('admin-all')
+  getAllTransactions() {
+    return this.transactionService.getAllTransactions();
+  }
+
+  @UseGuards(new AdminAuthGuard())
   @ApiParam({
     name: 'transactionId',
   })
@@ -56,6 +67,7 @@ export class TransactionController {
     return this.transactionService.getTransactionById(param);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiParam({
     name: 'transactionId',
   })
@@ -64,6 +76,7 @@ export class TransactionController {
     return this.transactionService.getTransactionById(param);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiParam({
     name: 'reference',
   })
@@ -95,24 +108,28 @@ export class TransactionController {
     );
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiParam({ name: 'currency' })
   @Get('withdrawal-fee/:currency')
   getWithdrawalFees(@Param('currency') param: string) {
     return this.transactionService.getFees(param);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiBody({ type: SellDTO })
   @Post('sell')
   async createSellRequest(@Body() body: SellDTO) {
     return await this.sellService.sellCrypto(body);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiBody({ type: BuyDTO })
   @Post('buy')
   async createBuyRequest(@Body() body: BuyDTO) {
     return await this.buyService.initiateBuy(body);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiBody({ type: SendDTO })
   @Post('withdraw')
   async withdrawRequest(@Body() body: SendDTO) {
@@ -120,6 +137,7 @@ export class TransactionController {
     return await this.sendService.sendCrypto(body);
   }
 
+  @UseGuards(AuthorizationGuard)
   @ApiBody({ type: SwapDTO })
   @Post('swap')
   async swapRequest(@Body() body: SwapDTO) {
@@ -131,5 +149,35 @@ export class TransactionController {
   @Put(':transactionId')
   async moneySent(@Param('transactionId') param: string) {
     return await this.buyService.confirmBuy(param);
+  }
+
+  @UseGuards(new AdminAuthGuard())
+  @ApiParam({ name: 'transactionId' })
+  @Put('buy/payout/:transactionId')
+  async buyPayout(
+    @Param('transactionId') param: string,
+    @User() user: AdminEntity,
+  ) {
+    return await this.buyService.adminPayout(param, user.id);
+  }
+
+  @UseGuards(new AdminAuthGuard())
+  @ApiParam({ name: 'transactionId' })
+  @Put('buy/payout/:transactionId')
+  async sellPayout(
+    @Param('transactionId') param: string,
+    @User() user: AdminEntity,
+  ) {
+    return await this.sellService.markTransactionAsDone(param, user.id);
+  }
+
+  @UseGuards(new AdminAuthGuard())
+  @ApiParam({ name: 'transactionId' })
+  @Put('swap/payout/:transactionId')
+  async swapPayout(
+    @Param('transactionId') param: string,
+    @User() user: AdminEntity,
+  ) {
+    return await this.swapService.adminPayout(param, user.id);
   }
 }

@@ -1,4 +1,5 @@
 import { genSalt, hash } from 'bcrypt';
+import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import {
   Column,
   PrimaryGeneratedColumn,
@@ -6,6 +7,7 @@ import {
   Entity,
   BeforeUpdate,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('Admin')
@@ -45,4 +47,8 @@ export class AdminEntity extends BaseEntity {
   async beforeUpdated() {
     this.updatedAt = new Date().toISOString();
   }
+
+  // relationships
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.admin)
+  transactions: TransactionEntity[];
 }

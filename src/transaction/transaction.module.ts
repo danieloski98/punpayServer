@@ -11,6 +11,7 @@ import { RateEntity } from 'src/Entities/rate.entity';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
       RateEntity,
       BankEntity,
       UserEntity,
+      AdminEntity,
     ]),
     HttpModule.register({}),
     // HttpService,

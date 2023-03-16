@@ -15,6 +15,7 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
+import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -25,6 +26,7 @@ export class SellService {
     private transactionRepo: Repository<TransactionEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     @InjectRepository(BankEntity) private bankRepo: Repository<BankEntity>,
+    @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     private httpService: HttpService,
   ) {}
 
@@ -107,6 +109,34 @@ export class SellService {
     } catch (error: any) {
       console.log(error);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  // mark sell transaction as done
+  async markTransactionAsDone(transactionId: string, adminId: string) {
+    const admin = await this.adminRepo.findOne({ where: { id: adminId } });
+    const transaction = await this.transactionRepo.findOne({
+      where: { id: transactionId },
+    });
+    if (admin === null) {
+      throw new BadRequestException('Admin not found');
+    }
+
+    if (transaction === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+
+    if (transaction.status !== TRANSACTION_STATUS.CONFIRMED) {
+      throw new BadRequestException('This transaction is still been processed');
+    } else {
+      // mark as complete
+      await this.transactionRepo.update(
+        { id: transactionId },
+        { status: TRANSACTION_STATUS.PAID, adminId },
+      );
+      return {
+        message: 'Transaction completed',
+      };
     }
   }
 }
