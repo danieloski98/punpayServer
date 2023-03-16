@@ -215,7 +215,7 @@ export class UserAuthService {
       throw new BadRequestException('Incorrect Email or Password');
     }
     const token = sign({ ...userCred, id: user.id }, process.env.JWT_KEY, {
-      expiresIn: '5h',
+      expiresIn: '1h',
       algorithm: 'HS256',
     });
     delete user.password;

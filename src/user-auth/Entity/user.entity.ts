@@ -6,10 +6,12 @@ import {
   BeforeUpdate,
   Entity,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { Verification } from 'src/verification/verification.entity';
+import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 
 @Entity('User')
 export class UserEntity extends BaseEntity {
@@ -64,4 +66,7 @@ export class UserEntity extends BaseEntity {
 
   @OneToOne(() => Verification, (verification) => verification.user)
   verification: Verification;
+
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
+  transactions: TransactionEntity[];
 }

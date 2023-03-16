@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import {
   BaseEntity,
@@ -6,6 +7,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -77,4 +79,7 @@ export class BankEntity extends BaseEntity {
     foreignKeyConstraintName: 'FKUSERBANK',
   })
   user: UserEntity;
+
+  @OneToMany(() => TransactionEntity, (transaction) => transaction.adminBank)
+  transactions: TransactionEntity[];
 }
