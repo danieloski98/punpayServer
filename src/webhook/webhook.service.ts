@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { WEBHOOKS } from 'src/UTILS/Webhook.events';
-import { NotificationService } from 'src/global-services/notification/notification.service';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { depositSuccessful } from 'src/types/depositsuccessful';
 import { withDrawalSuccessful } from 'src/types/withdrawalApproved';
@@ -13,16 +12,18 @@ import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { EmailService } from 'src/global-services/email/email.service';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class WebhookService {
   constructor(
-    private notificationService: NotificationService,
+    // private notificationService: NotificationService,
     private emailService: EmailService,
     @InjectRepository(TransactionEntity)
     private transactionRepo: Repository<TransactionEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
+    private notificationService: NotificationService,
   ) {}
 
   private async WithdrawalRejected(body: WithdrawalRejected) {
@@ -70,14 +71,13 @@ export class WebhookService {
                 please try again
               `,
               );
-              this.notificationService.sendIndieNotification(
-                user.id,
-                'Sell Transaction Failed',
-                `
-              Your SELL transaction with ID-${transaction.id} failed,
-              please try again
-            `,
-              );
+              await this.notificationService.sendNotifiication({
+                isAdmin: false,
+                userId: user.id,
+                title: 'Sell Transaction Failed',
+                body: `Your SELL transaction with ID-${transaction.id} failed,
+                please try again`,
+              });
               break;
             }
             case 3: {
@@ -87,13 +87,12 @@ export class WebhookService {
                 Your SWAP transaction with ID-${transaction.id} failed, please try again
               `,
               );
-              this.notificationService.sendIndieNotification(
-                user.id,
-                'Swap Transaction Failed',
-                `
-                Your SWAP transaction with ID-${transaction.id} failed, please try again
-            `,
-              );
+              await this.notificationService.sendNotifiication({
+                userId: user.id,
+                isAdmin: false,
+                title: `Swap Transaction Failed`,
+                body: `Your SWAP transaction with ID-${transaction.id} failed, please try again`,
+              });
             }
             case 4: {
               this.emailService.generateSendUserEmail(
@@ -102,13 +101,12 @@ export class WebhookService {
                 Your Withdrawal transaction with ID-${transaction.id} failed, please try again
               `,
               );
-              this.notificationService.sendIndieNotification(
-                user.id,
-                'Withdrawal Transaction Failed',
-                `
-                Your Withdrawal transaction with ID-${transaction.id} failed, please try again
-            `,
-              );
+              await this.notificationService.sendNotifiication({
+                isAdmin: false,
+                userId: user.id,
+                title: `Withdrawal Transaction Failed`,
+                body: ` Your Withdrawal transaction with ID-${transaction.id} failed, please try again`,
+              });
             }
           }
         }
@@ -120,47 +118,36 @@ export class WebhookService {
           });
           switch (transaction.transactionType) {
             case 1: {
-              this.emailService.generateSendUserEmail(
-                admin.email,
-                `
-                Your Sell transaction payout with ID-${transaction.id} you intiated failed,
-                please try again
-              `,
-              );
+              await this.notificationService.sendNotifiication({
+                isAdmin: true,
+                title: `Sell Transaction Failed`,
+                body: ` Your Sell transaction payout with ID-${transaction.id} intiated by admin with email - ${admin.email} failed,
+                please try again`,
+              });
               break;
             }
             case 3: {
-              this.emailService.generateSendUserEmail(
-                admin.email,
-                `
-                Your SWAP transaction payout with ID-${transaction.id} you intialtied failed, please try again
-              `,
-              );
+              await this.notificationService.sendNotifiication({
+                isAdmin: true,
+                title: `Swap Transaction Failed`,
+                body: ` Your Swap transaction payout with ID-${transaction.id} intiated by admin with email - ${admin.email} failed,
+                please try again`,
+              });
               break;
             }
             case 2: {
-              this.emailService.generateAdminEmailNotificationCode(
-                admin.email,
-                `
-                The Buy transaction payout with ID-${transaction.id} you initiatied failed, please confirm and try again try again
-              `,
-              );
+              await this.notificationService.sendNotifiication({
+                isAdmin: true,
+                title: `Buy Transaction Failed`,
+                body: ` Your Buy transaction payout with ID-${transaction.id} intiated by admin with email - ${admin.email} failed,
+                please try again`,
+              });
               break;
             }
           }
         }
         return;
       }
-      // update transaction status
-      // await this.transactionRepo.update(
-      //   { quidaxTransactionId: body.data.id },
-      //   { status: TRANSACTION_STATUS.FAILED },
-      // );
-      // this.notificationService.sendIndieNotification(
-      //   transaction.userId,
-      //   'Withdrawal failed',
-      //   `Transaction with ID-${transaction.id} failed, please try again`,
-      // );
     }
   }
   private async withDrawalSuccessful(body: withDrawalSuccessful) {
@@ -181,12 +168,11 @@ export class WebhookService {
               { id: transaction.id },
               { status: TRANSACTION_STATUS.CONFIRMED },
             );
-            this.emailService.generateSendUserEmail(
-              admin.email,
-              `
-              Your Sell transaction payout with ID-${transaction.id} you intiated was successfull
-            `,
-            );
+            await this.notificationService.sendNotifiication({
+              isAdmin: true,
+              title: `Sell Transaction Successful`,
+              body: ` Your Sell transaction payout with ID-${transaction.id} intiated by admin with email-${admin.email} was successfull`,
+            });
             break;
           }
           case 3: {
@@ -194,12 +180,11 @@ export class WebhookService {
               { id: transaction.id },
               { status: TRANSACTION_STATUS.PAID },
             );
-            this.emailService.generateSendUserEmail(
-              admin.email,
-              `
-              Your SWAP transaction payout with ID-${transaction.id} you intialtied was successfull.
-            `,
-            );
+            await this.notificationService.sendNotifiication({
+              isAdmin: true,
+              title: `Swap Transaction Successful`,
+              body: ` Your Swap transaction payout with ID-${transaction.id} intiated by admin with email-${admin.email} was successful`,
+            });
             break;
           }
           case 2: {
@@ -207,12 +192,11 @@ export class WebhookService {
               { id: transaction.id },
               { status: TRANSACTION_STATUS.PAID },
             );
-            this.emailService.generateAdminEmailNotificationCode(
-              admin.email,
-              `
-              The Buy transaction payout with ID-${transaction.id} you initiatied was successfull
-            `,
-            );
+            await this.notificationService.sendNotifiication({
+              isAdmin: true,
+              title: `Buy Transaction Successful`,
+              body: ` Your Buy transaction payout with ID-${transaction.id} intiated by admin with email-${admin.email} was successful`,
+            });
             break;
           }
         }
@@ -245,13 +229,12 @@ export class WebhookService {
               Your Withdrawal transaction with ID-${transaction.id} was successfull
             `,
             );
-            this.notificationService.sendIndieNotification(
-              user.id,
-              'Withdrawal Transaction Failed',
-              `
-              Your Withdrawal transaction with ID-${transaction.id} was successful
-          `,
-            );
+            await this.notificationService.sendNotifiication({
+              isAdmin: false,
+              userId: user.id,
+              title: 'Withdrawal Transaction Successful',
+              body: `Your withdrawal transaction with ID-${transaction.id} was successful`,
+            });
             await this.transactionRepo.update(
               { id: transaction.id },
               { status: TRANSACTION_STATUS.PAID },
@@ -284,14 +267,15 @@ export class WebhookService {
           transactionReference: randomUUID(),
         })
         .save();
-      await this.notificationService.sendIndieNotification(
-        user.id,
-        'Deposit Successful',
-        `
+      await this.notificationService.sendNotifiication({
+        isAdmin: false,
+        userId: user.id,
+        title: 'Deposit Successfu',
+        body: `
           A deposit of ${body.data.amount}-${body.data.currency} was made to your wallet
           ${body.data.wallet.deposit_address}
         `,
-      );
+      });
     }
   }
 
