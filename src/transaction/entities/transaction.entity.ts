@@ -87,10 +87,12 @@ export class TransactionEntity extends BaseEntity {
   }
 
   // relationships
-  @ManyToOne(() => UserEntity, (user) => user.transactions, {
-    cascade: ['insert', 'remove', 'update'],
+  @ManyToOne(() => UserEntity, (user) => user.transactions)
+  @JoinColumn({
+    referencedColumnName: 'id',
+    name: 'userId',
+    foreignKeyConstraintName: 'TRANSACTION:USER',
   })
-  @JoinColumn({ referencedColumnName: 'id', name: 'userId' })
   user: UserEntity;
 
   @ManyToOne(() => AdminEntity, (admin) => admin.transactions)
