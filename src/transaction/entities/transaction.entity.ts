@@ -16,10 +16,10 @@ export class TransactionEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   userId: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   adminId: string;
 
   @Column({ type: 'varchar', nullable: true })
@@ -46,10 +46,10 @@ export class TransactionEntity extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   currencyRate: number;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   payoutCurrency: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   hash: string;
 
   @Column({ type: 'float', nullable: true })
@@ -58,10 +58,10 @@ export class TransactionEntity extends BaseEntity {
   @Column({ type: 'simple-array', nullable: true })
   images: string[];
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   transactionReference: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   withdrawalAddress: string;
 
   @Column({ type: 'int', nullable: true })
@@ -86,20 +86,13 @@ export class TransactionEntity extends BaseEntity {
     this.updatedAt = new Date().toISOString();
   }
 
-  // relationships
+  //relationships
   @ManyToOne(() => UserEntity, (user) => user.transactions)
-  @JoinColumn({
-    referencedColumnName: 'id',
-    name: 'userId',
-    foreignKeyConstraintName: 'TRANSACTION:USER',
-  })
   user: UserEntity;
 
   @ManyToOne(() => AdminEntity, (admin) => admin.transactions)
-  @JoinColumn({ referencedColumnName: 'id', name: 'adminId' })
   admin: AdminEntity;
 
   @ManyToOne(() => BankEntity, (bank) => bank.transactions)
-  @JoinColumn({ referencedColumnName: 'id', name: 'bankId' })
   adminBank: BankEntity;
 }
