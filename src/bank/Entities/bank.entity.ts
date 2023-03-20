@@ -76,7 +76,7 @@ export class BankEntity extends BaseEntity {
   @JoinColumn({
     referencedColumnName: 'id',
     name: 'userId',
-    foreignKeyConstraintName: 'FKUSERBANK',
+    // foreignKeyConstraintName: 'FKUSERBANK',
   })
   user: UserEntity;
 
