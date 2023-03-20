@@ -5,7 +5,7 @@ export class NotificationEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userId: string;
 
   @Column({ type: 'boolean', default: false })
@@ -14,9 +14,9 @@ export class NotificationEntity {
   @Column({ type: 'varchar', nullable: false })
   title: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'varchar', nullable: false })
   body: string;
 
-  @Column({ type: 'text', default: new Date().toDateString() })
+  @Column({ type: 'varchar', default: new Date().toDateString() })
   createdAt: string;
 }
