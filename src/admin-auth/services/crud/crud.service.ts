@@ -116,7 +116,7 @@ export class CrudService {
 
   async changePassword(payload: ChangePassword) {
     const otp = await this.otpRepo.findOne({
-      where: { code: payload.otp, type: OTP_TYPE.ADMIN },
+      where: { code: payload.otp },
     });
     const user = await this.adminRepo.findOne({
       where: { id: payload.adminId },

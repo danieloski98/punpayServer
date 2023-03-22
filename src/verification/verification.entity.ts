@@ -29,7 +29,7 @@ export class Verification {
   identificationDOB: string;
 
   @Column({ type: 'boolean', default: false })
-  approved: string;
+  approved: boolean;
 
   @Column({ type: 'varchar', default: new Date().toDateString() })
   createdAt: string;
