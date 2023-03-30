@@ -232,8 +232,8 @@ export class BanksService {
         id: bankId,
       },
     });
-    if (bankExist !== null) {
-      throw new BadRequestException('Bank already exist');
+    if (bankExist === null) {
+      throw new BadRequestException("Bank deosn't exist");
     }
     // update the bank
     await this.bankRepo.update(
