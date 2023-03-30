@@ -42,4 +42,24 @@ export class VerificationService {
       message: 'verification uploaded and is processing',
     };
   }
+
+  async getUserVerification(userId: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+
+    const verificationEntry = await this.verificationRepo.findOne({
+      where: { userId },
+    });
+
+    return {
+      message:
+        verificationEntry === null
+          ? 'No entry found'
+          : 'verification entry found',
+      data: verificationEntry,
+    };
+  }
 }

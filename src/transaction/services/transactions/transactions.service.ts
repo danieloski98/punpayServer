@@ -30,7 +30,10 @@ export class TransactionsService {
   ) {}
 
   async getTransactionById(id: string) {
-    const data = await this.transactionRepo.findOne({ where: { id } });
+    const data = await this.transactionRepo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!data === null) {
       throw new BadRequestException('Transaction not found');
     }
@@ -39,7 +42,14 @@ export class TransactionsService {
       throw new BadRequestException('user not found');
     }
     // check the try of transaction
-    if (data.transactionType === 1) {
+    if (data.transactionType === TRANSACTION_TYPE.BUY) {
+      const bank = await this.bankRepo.findOne({
+        where: { id: data.bankId.toString() },
+      });
+      data['bank'] = bank;
+      return { data };
+    }
+    if (data.transactionType === TRANSACTION_TYPE.RECIEVED) {
       // get the deposit from quidax
       try {
         // Validate wallet address
@@ -63,7 +73,11 @@ export class TransactionsService {
         throw new InternalServerErrorException(error.message);
       }
     }
-    if (data.transactionType === 1 || data.transactionType === 4) {
+    if (
+      data.transactionType === TRANSACTION_TYPE.SELL ||
+      data.transactionType === TRANSACTION_TYPE.SEND ||
+      data.transactionType === TRANSACTION_TYPE.SWAP
+    ) {
       // fetch withdrawal details
       try {
         // Validate wallet address

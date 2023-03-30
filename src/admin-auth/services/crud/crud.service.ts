@@ -124,7 +124,7 @@ export class CrudService {
     if (otp === null || otp.expired) {
       throw new BadRequestException('OTP invalid');
     } else {
-      this.otpRepo.delete({ id: otp.id });
+      await this.otpRepo.delete({ id: otp.id });
     }
 
     if (user === null) {

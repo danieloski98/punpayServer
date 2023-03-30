@@ -74,7 +74,7 @@ export class RateService {
 
   async updateRate(id: string, rate: number) {
     const exists = await this.rateRepo.findOne({ where: { id } });
-    if (exists === null || exists !== undefined) {
+    if (exists === null) {
       throw new BadRequestException('Rate not found');
     }
 

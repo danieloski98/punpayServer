@@ -42,15 +42,15 @@ export class TransactionController {
     return this.sellService.fetchAdminAddress(param);
   }
 
-  @UseGuards(new AdminAuthGuard())
-  @ApiParam({
-    name: 'type',
-    description: '0 = Deposit, 1=SELL, 2=BUY, 3=SWAP, 4=SEND',
-  })
-  @Get('admin/:type')
-  getTransactions(@Param('type') param: string) {
-    return this.transactionService.getTransactions(+param);
-  }
+  // @UseGuards(new AdminAuthGuard())
+  // @ApiParam({
+  //   name: 'type',
+  //   description: '0 = Deposit, 1=SELL, 2=BUY, 3=SWAP, 4=SEND',
+  // })
+  // @Get('admin/:type')
+  // getTransactions(@Param('type') param: string) {
+  //   return this.transactionService.getTransactions(+param);
+  // }
 
   @UseGuards(new AdminAuthGuard())
   @Get('admin-all')

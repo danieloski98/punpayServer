@@ -4,7 +4,9 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 export class CreateBankDTO {
   @IsNotEmpty()
   @IsNumber()
-  @ApiProperty()
+  @ApiProperty({
+    description: 'The id gotten from the /getbanks',
+  })
   id: number;
 
   @IsNotEmpty()
