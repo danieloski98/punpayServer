@@ -28,6 +28,23 @@ export class CrudService {
     private emailService: EmailService,
   ) {}
 
+  async verifyPassword(id: string, password: string) {
+    const account = await this.adminRepo.findOne({ where: { id } });
+    if (account === null) {
+      throw new BadRequestException('Admin not found');
+    }
+
+    // verify the password
+    const match = await compare(password, account.password);
+    if (!match) {
+      throw new BadRequestException('Invalid password');
+    }
+
+    return {
+      message: 'Password match',
+    };
+  }
+
   async login(payload: AdminLoginDTO) {
     const account = await this.adminRepo.findOne({
       where: { email: payload.email },

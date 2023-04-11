@@ -17,6 +17,7 @@ import { CreateAccountDTO } from './DTO/CreateAccountDTO';
 import { CrudService } from './services/crud/crud.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolecheckGuard } from 'src/guards/rolecheck.guard';
+import { VerifyPasswordDTO } from './DTO/VerifyPassword';
 
 @Controller('admin-auth')
 export class AdminAuthController {
@@ -49,6 +50,14 @@ export class AdminAuthController {
   @Post('verify-OTP/:code')
   verifyOtp(@User() user: IUser, @Param('code') param: any) {
     return this.crudService.verifyOtp(user.id, param);
+  }
+
+  @ApiTags('ADMIN-AUTH')
+  @UseGuards(AdminAuthGuard)
+  @ApiBody({ type: VerifyPasswordDTO })
+  @Post('verify-password')
+  verifyPassword(@User() user: IUser, @Body() body: VerifyPasswordDTO) {
+    return this.crudService.verifyPassword(user.id, body.password);
   }
 
   @ApiTags('ADMIN-AUTH')
