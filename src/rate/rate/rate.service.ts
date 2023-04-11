@@ -4,11 +4,13 @@ import { RateEntity } from 'src/Entities/rate.entity';
 import { Repository } from 'typeorm';
 import { CreateRateDto } from '../dto/createrate.dto';
 import { RATE_CURRENCY, SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class RateService {
   constructor(
     @InjectRepository(RateEntity) private rateRepo: Repository<RateEntity>,
+    private httpService: HttpService,
   ) {}
 
   async getSupportedCurrencies() {

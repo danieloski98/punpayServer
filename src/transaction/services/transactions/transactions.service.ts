@@ -41,13 +41,36 @@ export class TransactionsService {
     if (user === null) {
       throw new BadRequestException('user not found');
     }
+    // get the wallet address of the user
+    let walletAddress = '';
+    try {
+      const request = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${data.payoutCurrency}`,
+        {
+          headers: {
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      walletAddress = request.data.data.deposit_address;
+      console.log(request.data.data);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
     // check the try of transaction
     if (data.transactionType === TRANSACTION_TYPE.BUY) {
       const bank = await this.bankRepo.findOne({
         where: { id: data.bankId.toString() },
       });
       data['bank'] = bank;
-      return { data };
+      data['withdrawalAddress'] = walletAddress;
+      delete data['user'].password;
+      delete data['user'].pin;
+      console.log(data);
+      return { data: { ...data, withdrawalAddress: walletAddress } };
     }
     if (data.transactionType === TRANSACTION_TYPE.RECIEVED) {
       // get the deposit from quidax
@@ -93,6 +116,9 @@ export class TransactionsService {
         );
         console.log(withdrawal.data);
         data['withdrawal'] = withdrawal.data.data;
+        data['withdrawalAddress'] = walletAddress;
+        delete data['user'].password;
+        delete data['user'].pin;
         return {
           data,
         };
@@ -198,8 +224,27 @@ export class TransactionsService {
   async getFees(currency: string) {
     try {
       // Validate wallet address
+      // const fees = await this.httpService.axiosRef.get(
+      //   `https://www.quidax.com/api/v1/fee?currency=${currency}`,
+      //   {
+      //     headers: {
+      //       authorization: `Bearer ${this.configService.get<string>(
+      //         'QDX_SECRET',
+      //       )}`,
+      //     },
+      //   },
+      // );
+      // console.log(fees.data);
+      // if (fees.data.status !== 'success') {
+      //   throw new BadRequestException('Invalid Address');
+      // }
+      // const fee = fees.data.data.fee * 2;
+      // return {
+      //   data: { fee },
+      // };
+      // Get Admin address for the tranfer
       const fees = await this.httpService.axiosRef.get(
-        `https://www.quidax.com/api/v1/fee?currency=${currency}`,
+        ` https://www.quidax.com/api/v1/users/me/wallets/${currency}/address`,
         {
           headers: {
             authorization: `Bearer ${this.configService.get<string>(
@@ -212,9 +257,8 @@ export class TransactionsService {
       if (fees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
-      return {
-        data: { ...fees.data },
-      };
+      // fee = fees.data.data.fee;
+      return { data: { address: fees.data.data.address } };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);

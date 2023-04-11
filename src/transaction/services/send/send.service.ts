@@ -14,6 +14,7 @@ import { Repository } from 'typeorm';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { randomUUID } from 'crypto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SendService {
@@ -22,6 +23,7 @@ export class SendService {
     private transactionRepo: Repository<TransactionEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private httpService: HttpService,
+    private configService: ConfigService,
   ) {}
 
   async sendCrypto(payload: SendDTO) {
@@ -35,6 +37,72 @@ export class SendService {
     }
     if (!SUPPORTED_CURRENCY.includes(payload.transactionCurrency)) {
       throw new BadRequestException('Currency not supported');
+    }
+    // get withdrawalFee
+    let fee = 0;
+    let wallet;
+    try {
+      // Get Admin address for the tranfer
+      const fees = await this.httpService.axiosRef.get(
+        ` https://www.quidax.com/api/v1/users/me/wallets/${payload.transactionCurrency}/address`,
+        {
+          headers: {
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      console.log(fees.data);
+      if (fees.data.status !== 'success') {
+        throw new BadRequestException('Invalid Address');
+      }
+      wallet = fees.data.data.address;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+    try {
+      // Validate wallet address
+      const fees = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/fee?currency=${payload.transactionCurrency}`,
+        {
+          headers: {
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      console.log(fees.data);
+      if (fees.data.status !== 'success') {
+        throw new BadRequestException('Invalid Address');
+      }
+      fee = fees.data.data.fee;
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+
+    // make the transfer to The Admin wallet
+    try {
+      const response = await this.httpService.axiosRef.post(
+        `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
+        {
+          currency: payload.transactionCurrency,
+          amount: fee,
+          fund_uid: wallet,
+          transaction_note: `withrawal fee for ${payload.transactionAmount}-${payload.transactionCurrency}`,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${process.env.QDX_SECRET}`,
+          },
+        },
+      );
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(error.message);
     }
 
     try {
