@@ -21,6 +21,7 @@ import { WebhookModule } from './webhook/webhook.module';
 import { VerificationModule } from './verification/verification.module';
 import { NotificationsService } from './global-services/notifications/notifications.service';
 import { NotificationModule } from './notification/notification.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -31,6 +32,12 @@ import { NotificationModule } from './notification/notification.module';
     TypeOrmModule.forRoot(dataSourceOptions),
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: +process.env.REDIS_PORT,
+      },
     }),
     HttpModule,
     UserAuthModule,
