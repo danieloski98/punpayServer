@@ -26,6 +26,5 @@ export class CreateAccountDTO {
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(8)
-  @IsAlphanumeric()
   password: string;
 }
