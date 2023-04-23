@@ -63,4 +63,27 @@ export class CrudService {
       message: 'Password changed',
     };
   }
+
+  async disabledAccount(id: string) {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (user === null) {
+      throw new BadRequestException(ERROR_CODES.USER_NOT_FOUND);
+    }
+    await this.userRepo.update({ id: user.id }, { accountDisabled: true });
+    return {
+      message: 'Account disabled',
+    };
+  }
+
+  async enabledAccount(id: string) {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (user === null) {
+      throw new BadRequestException(ERROR_CODES.USER_NOT_FOUND);
+    }
+
+    await this.userRepo.update({ id: user.id }, { accountDisabled: false });
+    return {
+      message: 'User account enabled',
+    };
+  }
 }

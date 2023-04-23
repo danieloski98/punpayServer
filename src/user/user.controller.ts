@@ -111,4 +111,22 @@ export class UserController {
   createNextOfKin(@Body() body: CreateNextOfKinDTO, @Req() req: Request) {
     return this.nextofkinService.createNextOfKin(req['user'].id, body);
   }
+
+  // create a function to call the disabled user method in the crud service
+
+  @UseGuards(AuthorizationGuard)
+  @ApiTags('ADMIN')
+  @ApiParam({ name: 'id' })
+  @Put('disable-user/:id')
+  disableUser(@Param('id') id: string) {
+    return this.crudService.disabledAccount(id);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiTags('ADMIN')
+  @ApiParam({ name: 'id' })
+  @Put('enable-user/:id')
+  enableUser(@Param('id') id: string) {
+    return this.crudService.enabledAccount(id);
+  }
 }

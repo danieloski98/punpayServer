@@ -34,6 +34,9 @@ export class UserEntity extends BaseEntity {
   emailVerified: boolean;
 
   @Column({ nullable: false, default: false })
+  accountDisabled: boolean;
+
+  @Column({ nullable: false, default: false })
   KYCVerified: boolean;
 
   @Column({ nullable: false })
