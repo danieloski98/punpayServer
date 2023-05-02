@@ -34,7 +34,7 @@ export class RateService {
   }
 
   async updateSwapRepo(payload: CreateSwapPercentageDTO) {
-    const swap = await this.swapRepo.find({});
+    const swap = await this.swapRepo.find();
 
     if (swap.length < 1) {
       throw new BadRequestException('Swap Percentage has nott been created');
@@ -52,11 +52,11 @@ export class RateService {
   }
 
   async getSwap() {
-    const swap = await this.swapRepo.findOne({});
+    const swap = await this.swapRepo.find();
 
     return {
       message: 'Swap rate created',
-      data: swap,
+      data: swap[0],
     };
   }
 
