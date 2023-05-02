@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SellService } from './services/sell/sell.service';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiTags, PartialType } from '@nestjs/swagger';
 import { SellDTO } from './dto/sell.dto';
 import { SendDTO } from './dto/send.dto';
 import { SendService } from './services/send/send.service';
@@ -23,6 +23,8 @@ import { User } from 'src/decorators/user.decorator';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { ApproveTransactionDTO } from './dto/approveTransaction.DTO';
+import { DeclineTransactionDTO } from './dto/DelcineTransactionDTO';
 
 @ApiTags('TRANSACTIONS')
 @Controller('transaction')
@@ -41,7 +43,6 @@ export class TransactionController {
   getAdminWalletAddress(@Param('currency') param: string) {
     return this.sellService.fetchAdminAddress(param);
   }
-
   // @UseGuards(new AdminAuthGuard())
   // @ApiParam({
   //   name: 'type',
@@ -71,9 +72,18 @@ export class TransactionController {
   @ApiParam({
     name: 'transactionId',
   })
-  @Get('user/:transactionId')
+  @Get('user/all/:userId')
+  getUserTransactions(@Param('userId') param: string) {
+    return this.transactionService.getUserTransactions(param);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiParam({
+    name: 'transactionId',
+  })
+  @Get('user/:userId')
   getUserTransactionbYId(@Param('transactionId') param: string) {
-    return this.transactionService.getTransactionById(param);
+    return this.transactionService.getTransactionByUserId(param);
   }
 
   @UseGuards(AuthorizationGuard)
@@ -152,32 +162,19 @@ export class TransactionController {
   }
 
   @UseGuards(new AdminAuthGuard())
-  @ApiParam({ name: 'transactionId' })
-  @Put('buy/payout/:transactionId')
-  async buyPayout(
-    @Param('transactionId') param: string,
-    @User() user: AdminEntity,
-  ) {
-    return await this.buyService.adminPayout(param, user.id);
+  @ApiBody({ type: ApproveTransactionDTO })
+  @Put('approve-transaction')
+  async approveTransaction(@Body() body: ApproveTransactionDTO) {
+    return await this.transactionService.approveTransaction(body.id, body.hash);
   }
 
   @UseGuards(new AdminAuthGuard())
-  @ApiParam({ name: 'transactionId' })
-  @Put('buy/payout/:transactionId')
-  async sellPayout(
-    @Param('transactionId') param: string,
-    @User() user: AdminEntity,
-  ) {
-    return await this.sellService.markTransactionAsDone(param, user.id);
-  }
-
-  @UseGuards(new AdminAuthGuard())
-  @ApiParam({ name: 'transactionId' })
-  @Put('swap/payout/:transactionId')
-  async swapPayout(
-    @Param('transactionId') param: string,
-    @User() user: AdminEntity,
-  ) {
-    return await this.swapService.adminPayout(param, user.id);
+  @ApiBody({
+    type: DeclineTransactionDTO,
+    description: 'The hash of the transaction is not needed in the case',
+  })
+  @Put('decline-transaction')
+  async Payout(@Body() body: ApproveTransactionDTO) {
+    return await this.transactionService.declienTransaction(body.id);
   }
 }

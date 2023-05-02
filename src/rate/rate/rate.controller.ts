@@ -12,6 +12,7 @@ import { RateService } from './rate.service';
 import { ReadRateDto } from '../dto/read.rate.dto';
 import { UpdateRateDto } from '../dto/update.rate';
 import { CreateRateDto } from '../dto/createrate.dto';
+import { CreateSwapPercentageDTO } from '../dto/createSwapPercentage.DTO';
 
 @ApiTags('RATE')
 @Controller('rate')
@@ -22,6 +23,12 @@ export class RateController {
   @ApiOkResponse({ type: String, isArray: true })
   getSupportedCurrencies() {
     return this.rateService.getSupportedCurrencies();
+  }
+
+  @Get('swap-rate')
+  @ApiOkResponse({ type: String, isArray: true })
+  getSwapRate() {
+    return this.rateService.getSwap();
   }
 
   @Get('')
@@ -45,12 +52,26 @@ export class RateController {
     return this.rateService.createRate(body);
   }
 
+  @Post('create/swap-rate')
+  @ApiBody({ type: CreateSwapPercentageDTO })
+  @ApiOkResponse({ type: CreateSwapPercentageDTO })
+  createSwapRate(@Body() body: CreateSwapPercentageDTO) {
+    return this.rateService.createSwapRepo(body);
+  }
+
   @Put(':id/:amount')
   @ApiParam({ name: 'id' })
   @ApiParam({ name: 'amount', description: '' })
   @ApiOkResponse({ type: UpdateRateDto })
   updateCoin(@Param('id') param: any, @Param('amount') rate: any) {
     return this.rateService.updateRate(param, +rate);
+  }
+
+  @Put('swap-rate')
+  @ApiBody({ type: CreateSwapPercentageDTO })
+  @ApiOkResponse({ type: UpdateRateDto })
+  updateSwap(@Body() body: CreateSwapPercentageDTO) {
+    return this.rateService.updateSwapRepo(body);
   }
 
   @Delete(':id')

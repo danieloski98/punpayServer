@@ -12,6 +12,7 @@ import { BankEntity } from 'src/bank/Entities/bank.entity';
 import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { EmailService } from 'src/global-services/email/email.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
     BuyService,
     SwapService,
     SendService,
+    EmailService,
   ],
 })
 export class TransactionModule {}
