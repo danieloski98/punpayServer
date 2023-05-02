@@ -1,0 +1,18 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
+import { IsNotEmpty, IsString } from 'class-validator';
+
+@Exclude()
+export class ApproveTransactionDTO {
+  @IsString()
+  @IsNotEmpty()
+  @Expose()
+  @ApiProperty()
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @Expose()
+  @ApiProperty()
+  hash: string;
+}

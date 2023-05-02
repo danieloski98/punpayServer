@@ -16,6 +16,7 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
+import { EmailService } from 'src/global-services/email/email.service';
 
 @Injectable()
 export class TransactionsService {
@@ -27,6 +28,7 @@ export class TransactionsService {
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private httpService: HttpService,
     private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
 
   async getTransactionById(id: string) {
@@ -38,6 +40,110 @@ export class TransactionsService {
       throw new BadRequestException('Transaction not found');
     }
     const user = await this.userRepo.findOne({ where: { id: data.userId } });
+    if (user === null) {
+      throw new BadRequestException('user not found');
+    }
+    // get the wallet address of the user
+    let walletAddress = '';
+    try {
+      const request = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${data.payoutCurrency}`,
+        {
+          headers: {
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      walletAddress = request.data.data.deposit_address;
+      console.log(request.data.data);
+    } catch (error) {
+      console.log(error.message);
+      throw new InternalServerErrorException(error.message);
+    }
+    // check the try of transaction
+    if (data.transactionType === TRANSACTION_TYPE.BUY) {
+      const bank = await this.bankRepo.findOne({
+        where: { id: data.bankId.toString() },
+      });
+      data['bank'] = bank;
+      data['withdrawalAddress'] = walletAddress;
+      delete data['user'].password;
+      delete data['user'].pin;
+      console.log(data);
+      return { data: { ...data, withdrawalAddress: walletAddress } };
+    }
+    if (data.transactionType === TRANSACTION_TYPE.RECIEVED) {
+      // get the deposit from quidax
+      try {
+        // Validate wallet address
+        const deposit = await this.httpService.axiosRef.get(
+          `https://www.quidax.com/api/v1/users/${user.quidaxId}/deposits/${data.quidaxTransactionId}`,
+          {
+            headers: {
+              authorization: `Bearer ${this.configService.get<string>(
+                'QDX_SECRET',
+              )}`,
+            },
+          },
+        );
+        console.log(deposit.data);
+        data['deposit'] = deposit.data.data;
+        return {
+          data,
+        };
+      } catch (error) {
+        console.log(error.message);
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+    if (
+      data.transactionType === TRANSACTION_TYPE.SELL ||
+      data.transactionType === TRANSACTION_TYPE.SEND ||
+      data.transactionType === TRANSACTION_TYPE.SWAP
+    ) {
+      // fetch withdrawal details
+      try {
+        // Validate wallet address
+        const withdrawal = await this.httpService.axiosRef.get(
+          `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws/${data.quidaxTransactionId}`,
+          {
+            headers: {
+              authorization: `Bearer ${this.configService.get<string>(
+                'QDX_SECRET',
+              )}`,
+            },
+          },
+        );
+        console.log(withdrawal.data);
+        data['withdrawal'] = withdrawal.data.data;
+        data['withdrawalAddress'] = walletAddress;
+        delete data['user'].password;
+        delete data['user'].pin;
+        return {
+          data,
+        };
+      } catch (error) {
+        console.log(error.message);
+        throw new InternalServerErrorException(error.message);
+      }
+    }
+    return {
+      message: 'Transaction Found',
+      data,
+    };
+  }
+
+  async getTransactionByUserId(id: string) {
+    const data = await this.transactionRepo.findOne({
+      where: { userId: id },
+      relations: ['user'],
+    });
+    if (data === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+    const user = await this.userRepo.findOne({ where: { id } });
     if (user === null) {
       throw new BadRequestException('user not found');
     }
@@ -182,6 +288,7 @@ export class TransactionsService {
   async getUserTransactions(userId: string) {
     const userTransactions = await this.transactionRepo.find({
       where: { userId },
+      relations: ['user'],
     });
     return {
       data: userTransactions,
@@ -224,27 +331,8 @@ export class TransactionsService {
   async getFees(currency: string) {
     try {
       // Validate wallet address
-      // const fees = await this.httpService.axiosRef.get(
-      //   `https://www.quidax.com/api/v1/fee?currency=${currency}`,
-      //   {
-      //     headers: {
-      //       authorization: `Bearer ${this.configService.get<string>(
-      //         'QDX_SECRET',
-      //       )}`,
-      //     },
-      //   },
-      // );
-      // console.log(fees.data);
-      // if (fees.data.status !== 'success') {
-      //   throw new BadRequestException('Invalid Address');
-      // }
-      // const fee = fees.data.data.fee * 2;
-      // return {
-      //   data: { fee },
-      // };
-      // Get Admin address for the tranfer
       const fees = await this.httpService.axiosRef.get(
-        ` https://www.quidax.com/api/v1/users/me/wallets/${currency}/address`,
+        `https://www.quidax.com/api/v1/fee?currency=${currency}`,
         {
           headers: {
             authorization: `Bearer ${this.configService.get<string>(
@@ -257,11 +345,87 @@ export class TransactionsService {
       if (fees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
-      // fee = fees.data.data.fee;
-      return { data: { address: fees.data.data.address } };
+      const fee = fees.data.data.fee * 2;
+      return {
+        data: { fee: fee },
+      };
     } catch (error) {
       console.log(error.message);
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async declienTransaction(id: string) {
+    const transaction = await this.transactionRepo.findOne({
+      where: { id },
+    });
+    if (transaction === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+    // get the user details
+    const user = await this.userRepo.findOne({
+      where: { id: transaction.userId },
+    });
+
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      transaction.status === TRANSACTION_STATUS.PENDING ||
+      transaction.status === TRANSACTION_STATUS.PROCESSING
+    ) {
+      await this.transactionRepo.update(
+        { id },
+        { status: TRANSACTION_STATUS.FAILED },
+      );
+      // send email to the user
+      return {
+        message: 'Transaction marked as failed',
+      };
+    } else {
+      throw new BadRequestException('Transaction already approved');
+    }
+  }
+
+  async approveTransaction(id: string, hash: string) {
+    const transaction = await this.transactionRepo.findOne({
+      where: { id },
+    });
+    if (transaction === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+    // get the user details
+    const user = await this.userRepo.findOne({
+      where: { id: transaction.userId },
+    });
+
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (
+      transaction.status === TRANSACTION_STATUS.PENDING ||
+      transaction.status === TRANSACTION_STATUS.PROCESSING
+    ) {
+      await this.transactionRepo.update(
+        { id },
+        { status: TRANSACTION_STATUS.CONFIRMED, hash },
+      );
+      // send email to the user
+      await this.emailService.sendApprovedEmailEmail(
+        user.email,
+        `
+        Look who funds just dropped in your account.
+        Your transaction with ID ${transaction.id} has been confirmed,
+        and your funds have been deposited into your account.
+      `,
+      );
+      return {
+        message: 'Transaction approved',
+      };
+    } else {
+      throw new BadRequestException('Transaction already approved');
     }
   }
 }

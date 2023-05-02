@@ -5,13 +5,60 @@ import { Repository } from 'typeorm';
 import { CreateRateDto } from '../dto/createrate.dto';
 import { RATE_CURRENCY, SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 import { HttpService } from '@nestjs/axios';
+import { SwapPercentageEntity } from '../swappercentage.entity';
+import { CreateSwapPercentageDTO } from '../dto/createSwapPercentage.DTO';
 
 @Injectable()
 export class RateService {
   constructor(
     @InjectRepository(RateEntity) private rateRepo: Repository<RateEntity>,
+    @InjectRepository(SwapPercentageEntity)
+    private swapRepo: Repository<SwapPercentageEntity>,
     private httpService: HttpService,
   ) {}
+
+  async createSwapRepo(payload: CreateSwapPercentageDTO) {
+    const swap = await this.swapRepo.find({});
+
+    if (swap.length > 0) {
+      throw new BadRequestException('Swap Percentage already exists');
+    }
+
+    // create the  swap rate
+    const newSwap = await this.swapRepo.create(payload).save();
+
+    return {
+      message: 'Swap rate created',
+      data: newSwap,
+    };
+  }
+
+  async updateSwapRepo(payload: CreateSwapPercentageDTO) {
+    const swap = await this.swapRepo.find({});
+
+    if (swap.length < 1) {
+      throw new BadRequestException('Swap Percentage has nott been created');
+    }
+
+    // updated the  swap rate
+    await this.swapRepo.update(
+      {},
+      { ...payload, updatededAt: new Date().toISOString() },
+    );
+
+    return {
+      message: 'Swap rate updated',
+    };
+  }
+
+  async getSwap() {
+    const swap = await this.swapRepo.findOne({});
+
+    return {
+      message: 'Swap rate created',
+      data: swap,
+    };
+  }
 
   async getSupportedCurrencies() {
     return {
