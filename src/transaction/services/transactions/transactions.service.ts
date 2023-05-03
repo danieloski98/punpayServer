@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { EmailService } from 'src/global-services/email/email.service';
+import { quidax } from 'src/UTILS/quidax';
 
 @Injectable()
 export class TransactionsService {
@@ -50,6 +51,7 @@ export class TransactionsService {
         `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${data.payoutCurrency}`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${this.configService.get<string>(
               'QDX_SECRET',
             )}`,
@@ -82,6 +84,7 @@ export class TransactionsService {
           `https://www.quidax.com/api/v1/users/${user.quidaxId}/deposits/${data.quidaxTransactionId}`,
           {
             headers: {
+              'Accept-Encoding': 'gzip,deflate,compress',
               authorization: `Bearer ${this.configService.get<string>(
                 'QDX_SECRET',
               )}`,
@@ -110,6 +113,7 @@ export class TransactionsService {
           `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws/${data.quidaxTransactionId}`,
           {
             headers: {
+              'Accept-Encoding': 'gzip,deflate,compress',
               authorization: `Bearer ${this.configService.get<string>(
                 'QDX_SECRET',
               )}`,
@@ -154,6 +158,7 @@ export class TransactionsService {
         `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${data.payoutCurrency}`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${this.configService.get<string>(
               'QDX_SECRET',
             )}`,
@@ -186,13 +191,14 @@ export class TransactionsService {
           `https://www.quidax.com/api/v1/users/${user.quidaxId}/deposits/${data.quidaxTransactionId}`,
           {
             headers: {
+              'Accept-Encoding': 'gzip,deflate,compress',
               authorization: `Bearer ${this.configService.get<string>(
                 'QDX_SECRET',
               )}`,
             },
           },
         );
-        console.log(deposit.data);
+        console.log(deposit.request.headers);
         data['deposit'] = deposit.data.data;
         return {
           data,
@@ -210,16 +216,20 @@ export class TransactionsService {
       // fetch withdrawal details
       try {
         // Validate wallet address
-        const withdrawal = await this.httpService.axiosRef.get(
-          `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws/${data.quidaxTransactionId}`,
-          {
-            headers: {
-              authorization: `Bearer ${this.configService.get<string>(
-                'QDX_SECRET',
-              )}`,
-            },
-          },
+        const withdrawal = await quidax.widthdrawal.fetchWithdrawal(
+          user.quidaxId,
+          data.quidaxTransactionId,
         );
+        // this.httpService.axiosRef.get(
+        //   `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws/${data.quidaxTransactionId}`,
+        //   {
+        //     headers: {
+        //       authorization: `Bearer ${this.configService.get<string>(
+        //         'QDX_SECRET',
+        //       )}`,
+        //     },
+        //   },
+        // );
         console.log(withdrawal.data);
         data['withdrawal'] = withdrawal.data.data;
         data['withdrawalAddress'] = walletAddress;
@@ -335,13 +345,14 @@ export class TransactionsService {
         `https://www.quidax.com/api/v1/fee?currency=${currency}`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${this.configService.get<string>(
               'QDX_SECRET',
             )}`,
           },
         },
       );
-      console.log(fees.data);
+      console.log(fees.request);
       if (fees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }

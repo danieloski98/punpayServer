@@ -39,7 +39,11 @@ import { BullModule } from '@nestjs/bull';
         port: +process.env.REDIS_PORT,
       },
     }),
-    HttpModule,
+    HttpModule.register({
+      headers: {
+        'Accept-Encoding': 'gzip,deflate,compress',
+      },
+    }),
     UserAuthModule,
     UserModule,
     BankModule,

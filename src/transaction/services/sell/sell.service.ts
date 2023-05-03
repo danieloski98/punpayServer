@@ -36,6 +36,7 @@ export class SellService {
         `https://www.quidax.com/api/v1/users/me/wallets/${currency}/address`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
@@ -76,6 +77,7 @@ export class SellService {
             },
             {
               headers: {
+                'Accept-Encoding': 'gzip,deflate,compress',
                 authorization: `Bearer ${process.env.QDX_SECRET}`,
               },
             },

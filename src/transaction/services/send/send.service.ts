@@ -47,6 +47,7 @@ export class SendService {
         ` https://www.quidax.com/api/v1/users/me/wallets/${payload.transactionCurrency}/address`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${this.configService.get<string>(
               'QDX_SECRET',
             )}`,
