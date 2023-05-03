@@ -91,11 +91,6 @@ export class UserAuthService {
           password: user.password,
         };
         const newUser = await this.userRepo.create(obj).save();
-        // create balance
-        // await this.balanceRepo.create({ userId: newUser.id }).save();
-        // create wallets for user
-        // send email
-        // generate code
         const options = {
           min: 10000,
           max: 19999,
@@ -215,7 +210,7 @@ export class UserAuthService {
       throw new BadRequestException('Incorrect Email or Password');
     }
     const token = sign({ ...userCred, id: user.id }, process.env.JWT_KEY, {
-      expiresIn: '1h',
+      expiresIn: '2d',
       algorithm: 'HS256',
     });
     delete user.password;

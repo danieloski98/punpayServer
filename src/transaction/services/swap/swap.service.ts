@@ -56,6 +56,7 @@ export class SwapService {
         },
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },

@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { NotificationService } from './global-services/notification/notification.service';
+import { quidax } from './UTILS/quidax';
 
 @Controller()
 export class AppController {
@@ -10,11 +11,8 @@ export class AppController {
   ) {}
 
   @Get()
-  getHello() {
-    return this.notificationService.sendIndieNotification(
-      '7c5884c0-c50d-489d-b339-171447eb9b48',
-      'test',
-      'This is a test service for just you',
-    );
+  async getHello() {
+    const res = await quidax.wallets.fetchCurrencyWallet('bc5m64wl', 'btc');
+    return res;
   }
 }

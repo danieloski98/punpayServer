@@ -105,6 +105,7 @@ export class BuyService {
         `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${transaction.payoutCurrency}`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
@@ -126,6 +127,7 @@ export class BuyService {
         },
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
