@@ -10,9 +10,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { OtpService } from 'src/global-services/otp/otp.service';
 import { EmailService } from 'src/global-services/email/email.service';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
 
 @Module({
-  imports: [UserAuthModule, TypeOrmModule.forFeature([AdminEntity])],
+  imports: [
+    UserAuthModule,
+    TypeOrmModule.forFeature([AdminEntity, BankEntity]),
+  ],
   controllers: [UserController],
   providers: [
     CrudService,

@@ -7,6 +7,7 @@ import {
   Entity,
   OneToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
@@ -65,6 +66,10 @@ export class UserEntity extends BaseEntity {
 
   // Relationships
   @OneToOne(() => BankEntity, (bank) => bank.user)
+  @JoinColumn({
+    referencedColumnName: 'id',
+    name: 'userId',
+  })
   bank: BankEntity;
 
   @OneToOne(() => Verification, (verification) => verification.user)

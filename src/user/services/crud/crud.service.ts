@@ -5,11 +5,13 @@ import { ChangePasswordDTO } from 'src/user/DTO/ChangePasswordDTO';
 import { ERROR_CODES } from 'src/UTILS/ErrorCodes';
 import { Repository } from 'typeorm';
 import { compare, genSalt, hash } from 'bcrypt';
+import { BankEntity } from 'src/bank/Entities/bank.entity';
 
 @Injectable()
 export class CrudService {
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(BankEntity) private bankRepo: Repository<BankEntity>,
   ) {}
 
   async getAllUsers() {
@@ -24,8 +26,12 @@ export class CrudService {
     const user = await this.userRepo.findOne({
       where: { id },
       // select: ['firstName', 'lastName', 'email', 'createdAt'],
-      relations: ['bank'],
     });
+    const bank = await this.bankRepo.findOne({
+      where: { userId: id },
+    });
+    console.log(bank);
+    user['bank'] = bank;
     if (user === null) {
       throw new BadRequestException(
         'User not found',

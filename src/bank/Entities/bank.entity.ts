@@ -73,11 +73,6 @@ export class BankEntity extends BaseEntity {
 
   // relationship
   @OneToOne(() => UserEntity, (user) => user.bank)
-  @JoinColumn({
-    referencedColumnName: 'id',
-    name: 'userId',
-    // foreignKeyConstraintName: 'FKUSERBANK',
-  })
   user: UserEntity;
 
   @OneToMany(() => TransactionEntity, (transaction) => transaction.adminBank)
