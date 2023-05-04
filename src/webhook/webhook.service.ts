@@ -265,6 +265,7 @@ export class WebhookService {
           status: TRANSACTION_STATUS.PAID,
           transactionType: TRANSACTION_TYPE.RECIEVED,
           transactionReference: randomUUID(),
+          createdAt: new Date().toISOString(),
         })
         .save();
       await this.notificationService.sendNotifiication({

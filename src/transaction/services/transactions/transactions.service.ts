@@ -120,9 +120,13 @@ export class TransactionsService {
             },
           },
         );
+        const bank = await this.bankRepo.findOne({
+          where: { userId: user.id },
+        });
         console.log(withdrawal.data);
         data['withdrawal'] = withdrawal.data.data;
         data['withdrawalAddress'] = walletAddress;
+        data['userBank'] = bank;
         delete data['user'].password;
         delete data['user'].pin;
         return {
@@ -399,7 +403,7 @@ export class TransactionsService {
     }
   }
 
-  async approveTransaction(id: string, hash: string) {
+  async approveTransaction(id: string, hash?: string) {
     const transaction = await this.transactionRepo.findOne({
       where: { id },
     });
@@ -421,7 +425,7 @@ export class TransactionsService {
     ) {
       await this.transactionRepo.update(
         { id },
-        { status: TRANSACTION_STATUS.CONFIRMED, hash },
+        { status: TRANSACTION_STATUS.CONFIRMED, hash: hash ? hash : '' },
       );
       // send email to the user
       await this.emailService.sendApprovedEmailEmail(
