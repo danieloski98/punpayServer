@@ -53,7 +53,7 @@ export class TransactionController {
   //   return this.transactionService.getTransactions(+param);
   // }
 
-  @UseGuards(new AdminAuthGuard())
+  // @UseGuards(new AdminAuthGuard())
   @Get('admin-all')
   getAllTransactions() {
     return this.transactionService.getAllTransactions();
@@ -151,7 +151,6 @@ export class TransactionController {
   @ApiBody({ type: SwapDTO })
   @Post('swap')
   async swapRequest(@Body() body: SwapDTO) {
-    console.log(body);
     return await this.swapService.swapTransaction(body);
   }
 
@@ -163,7 +162,7 @@ export class TransactionController {
 
   @UseGuards(new AdminAuthGuard())
   @ApiBody({ type: ApproveTransactionDTO })
-  @Put('approve-transaction')
+  @Put('approve/transaction')
   async approveTransaction(@Body() body: ApproveTransactionDTO) {
     return await this.transactionService.approveTransaction(body.id, body.hash);
   }
