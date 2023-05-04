@@ -425,7 +425,7 @@ export class TransactionsService {
     ) {
       await this.transactionRepo.update(
         { id },
-        { status: TRANSACTION_STATUS.CONFIRMED, hash: hash ? hash : '' },
+        { status: TRANSACTION_STATUS.PAID, hash: hash ? hash : '' },
       );
       // send email to the user
       await this.emailService.sendApprovedEmailEmail(
@@ -440,7 +440,7 @@ export class TransactionsService {
         message: 'Transaction approved',
       };
     } else {
-      throw new BadRequestException('Transaction already approved');
+      throw new BadRequestException('Transaction already approved or declined');
     }
   }
 }
