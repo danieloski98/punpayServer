@@ -70,7 +70,7 @@ export class TransactionController {
 
   @UseGuards(AuthorizationGuard)
   @ApiParam({
-    name: 'transactionId',
+    name: 'userId',
   })
   @Get('user/all/:userId')
   getUserTransactions(@Param('userId') param: string) {
@@ -79,10 +79,10 @@ export class TransactionController {
 
   @UseGuards(AuthorizationGuard)
   @ApiParam({
-    name: 'transactionId',
+    name: 'userId',
   })
   @Get('user/:userId')
-  getUserTransactionbYId(@Param('transactionId') param: string) {
+  getUserTransactionbYId(@Param('userId') param: string) {
     return this.transactionService.getTransactionByUserId(param);
   }
 
