@@ -9,6 +9,7 @@ import { EmailService } from 'src/global-services/email/email.service';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { NotificationModule } from 'src/notification/notification.module';
 import { NotificationService } from 'src/notification/notification.service';
+import { MetamapService } from './metamap/metamap.service';
 
 @Module({
   imports: [
@@ -17,6 +18,11 @@ import { NotificationService } from 'src/notification/notification.service';
     NotificationModule,
   ],
   controllers: [WebhookController],
-  providers: [WebhookService, NotificationService, EmailService],
+  providers: [
+    WebhookService,
+    NotificationService,
+    EmailService,
+    MetamapService,
+  ],
 })
 export class WebhookModule {}
