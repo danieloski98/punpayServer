@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { MetaMapDTO } from './metamap.dto';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import { VerificationService } from 'src/verification/verification.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class MetamapService {
@@ -12,6 +14,8 @@ export class MetamapService {
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private configService: ConfigService,
+    private verificationService: VerificationService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   private async verify(signature, payloadBody) {
@@ -22,12 +26,31 @@ export class MetamapService {
   }
 
   async getMeta(metadata: MetaMapDTO) {
-    console.log(metadata);
     switch (metadata.eventName) {
       case 'step_completed': {
         break;
       }
       case 'verification_completed': {
+        // check if the user has verification
+        const hasVerification =
+          await this.verificationService.checkVerification(
+            metadata.metadata.userId,
+          );
+
+        if (hasVerification) {
+          break;
+        } else {
+          // create the verification
+          const verification =
+            await this.verificationService.createVerification({
+              link: metadata.resource,
+              metadata: metadata.metadata,
+              userId: metadata.metadata.userId,
+            });
+
+          // emit email event
+          this.eventEmitter.emit('VERIFICATION_SUBMITTED', metadata);
+        }
         break;
       }
       case 'verification_input_completed': {
@@ -43,6 +66,6 @@ export class MetamapService {
       }
     }
 
-    return { message: 'date recieved' };
+    return { message: 'data recieved' };
   }
 }

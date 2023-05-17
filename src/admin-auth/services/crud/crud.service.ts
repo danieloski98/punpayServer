@@ -9,8 +9,9 @@ import { CreateAccountDTO } from 'src/admin-auth/DTO/CreateAccountDTO';
 import { OtpEntity } from 'src/user-auth/Entity/otp.entity';
 import { ChangePassword } from 'src/admin-auth/DTO/ChangePasswordDTO';
 import { EmailService } from 'src/global-services/email/email.service';
-import { OTP_TYPE, TYPE_OF_OTP } from 'src/Enums/OTP_Type';
 import { OtpService } from 'src/global-services/otp/otp.service';
+import { AdminTypeEntity } from 'src/admin-auth/Entities/AdminType.entity';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,9 +25,57 @@ export class CrudService {
   constructor(
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     @InjectRepository(OtpEntity) private otpRepo: Repository<OtpEntity>,
+    @InjectRepository(AdminTypeEntity)
+    private adminTypeRepo: Repository<AdminTypeEntity>,
     private otpService: OtpService,
     private emailService: EmailService,
   ) {}
+
+  async createAdminRole(name: ADMINROLE) {
+    console.log(name);
+    const role = await this.adminTypeRepo.findOne({ where: { role: name } });
+    if (role) {
+      throw new BadRequestException('Role already exists');
+    }
+    switch (name) {
+      case ADMINROLE.SUPERADMIN: {
+        const newRole = this.adminTypeRepo.create({
+          role: name,
+        });
+        await this.adminTypeRepo.save(newRole);
+        break;
+      }
+      case ADMINROLE.TRANSACTIONS: {
+        const newRole = this.adminTypeRepo.create({
+          role: name,
+        });
+        await this.adminTypeRepo.save(newRole);
+        break;
+      }
+      case ADMINROLE.VERIFICATION: {
+        const newRole = this.adminTypeRepo.create({
+          role: name,
+        });
+        await this.adminTypeRepo.save(newRole);
+        break;
+      }
+      default: {
+        throw new BadRequestException('Invalid role');
+      }
+    }
+
+    return {
+      message: 'Admin role created',
+    };
+  }
+
+  async getAllAdminTypes() {
+    const adminTypes = await this.adminTypeRepo.find();
+    return {
+      message: 'All admin types',
+      data: adminTypes,
+    };
+  }
 
   async verifyPassword(id: string, password: string) {
     const account = await this.adminRepo.findOne({ where: { id } });
@@ -93,7 +142,7 @@ export class CrudService {
       password,
       bio: payload.bio,
       fullname: payload.fullname,
-      roles: payload.roles,
+      role: payload.role,
     };
     console.log(obj);
     const data = await this.adminRepo.create(obj).save();

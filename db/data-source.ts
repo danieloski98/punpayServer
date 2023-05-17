@@ -12,7 +12,7 @@ export const dataSourceOptions: DataSourceOptions = {
   password: process.env.NODE_ENV === 'development' ? 'Daniel98$' : 'daniel98',
   database: 'punpay',
   entities: ['./dist/**/*.entity.js'],
-  synchronize: true,
+  synchronize: false,
   migrations: ['./dist/db/migrations/*.js'],
 };
 const dataSource = new DataSource(dataSourceOptions);

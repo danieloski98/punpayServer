@@ -72,9 +72,6 @@ export class UserEntity extends BaseEntity {
   })
   bank: BankEntity;
 
-  @OneToOne(() => Verification, (verification) => verification.user)
-  verification: Verification;
-
   @OneToMany(() => TransactionEntity, (transaction) => transaction.user)
   transactions: TransactionEntity[];
 }

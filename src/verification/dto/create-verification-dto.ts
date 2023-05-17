@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsString } from 'class-validator';
 
 @Exclude()
 export class CreateVerifcationDTO {
@@ -8,23 +8,19 @@ export class CreateVerifcationDTO {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  identification_type: string;
+  userId: string;
+
+  @Expose()
+  @IsObject()
+  @IsNotEmpty()
+  @ApiProperty({
+    description: 'object containing the user details',
+  })
+  metadata: Record<string, any>;
 
   @Expose()
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  identification_name: string;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  identification_dob: string;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  identification_number: string;
+  link: string;
 }

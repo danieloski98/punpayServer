@@ -1,12 +1,5 @@
-import { UserEntity } from 'src/user-auth/Entity/user.entity';
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  AfterUpdate,
-  OneToOne,
-  JoinColumn,
-} from 'typeorm';
+import { VERIFICATION_STATUS } from 'src/Enums/VerificationStatus';
+import { Entity, PrimaryGeneratedColumn, Column, AfterUpdate } from 'typeorm';
 
 @Entity('VerificationDetails')
 export class Verification {
@@ -17,19 +10,20 @@ export class Verification {
   userId: string;
 
   @Column({ type: 'varchar', nullable: false })
-  identificationName: string;
+  link: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  identificationType: string;
+  @Column({ type: 'simple-json', nullable: true })
+  metadata: Record<string, any>;
 
-  @Column({ type: 'varchar', nullable: false })
-  identificationNumber: string;
+  @Column({ type: 'uuid', nullable: true })
+  approvedBy: string;
 
-  @Column({ type: 'varchar', nullable: false })
-  identificationDOB: string;
-
-  @Column({ type: 'boolean', default: false })
-  approved: boolean;
+  @Column({
+    type: 'varchar',
+    nullable: true,
+    default: VERIFICATION_STATUS.PENDING,
+  })
+  status: string;
 
   @Column({ type: 'varchar', default: new Date().toDateString() })
   createdAt: string;
@@ -41,11 +35,4 @@ export class Verification {
   async updated() {
     this.updatedAt = new Date().toDateString();
   }
-
-  // Reletionship
-  @OneToOne(() => UserEntity, (user) => user.verification, {
-    cascade: ['update', 'remove'],
-  })
-  @JoinColumn({ referencedColumnName: 'id', name: 'userId' })
-  user: UserEntity;
 }

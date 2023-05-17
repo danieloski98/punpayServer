@@ -285,4 +285,38 @@ export class EmailService {
       };
     }
   }
+
+  public async sendVerificationCreatedEmail(email: string, message: string) {
+    console.log(process.env.MAILGUN_SENDING_KEY);
+    try {
+      const mailOption: MailOptions = {
+        from: `Punpay Verification ${process.env.COMPANY_EMAIL}`,
+        to: email,
+        subject: `User Verification Request`,
+        html: `
+        <div> 
+        <p>${message}</p>
+        </div>`,
+      };
+      this.transport.sendMail(mailOption, (error: any, info: any) => {
+        if (error) {
+          this.logger.error(error);
+        } else {
+          this.logger.log(info);
+        }
+      });
+      return {
+        error: false,
+        successMessage: 'email sent',
+        statusCode: 200,
+      };
+    } catch (error) {
+      return {
+        error: true,
+        statusCode: 500,
+        trace: error,
+        errorMessage: 'Internal Server error',
+      };
+    }
+  }
 }
