@@ -27,7 +27,7 @@ export class RolecheckGuard implements CanActivate {
     const admin: AdminEntity = request['user'];
     if (admin) {
       const adminFound = await this.adminService.getAdminById(admin.id);
-      if (!this.checkSubset(roles, adminFound.data.roles)) {
+      if (!this.checkSubset(roles, adminFound.data.role)) {
         throw new UnauthorizedException('You do not have permission');
       } else {
         return true;

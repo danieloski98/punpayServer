@@ -10,12 +10,14 @@ import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { NotificationModule } from 'src/notification/notification.module';
 import { NotificationService } from 'src/notification/notification.service';
 import { MetamapService } from './metamap/metamap.service';
+import { VerificationModule } from 'src/verification/verification.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([TransactionEntity, UserEntity, AdminEntity]),
     HttpModule,
     NotificationModule,
+    VerificationModule,
   ],
   controllers: [WebhookController],
   providers: [

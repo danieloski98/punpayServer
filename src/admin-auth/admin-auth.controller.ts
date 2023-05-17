@@ -18,10 +18,26 @@ import { CrudService } from './services/crud/crud.service';
 import { Roles } from 'src/decorators/roles.decorator';
 import { RolecheckGuard } from 'src/guards/rolecheck.guard';
 import { VerifyPasswordDTO } from './DTO/VerifyPassword';
+import { CreateRoleDTO } from './DTO/CreateRoleDTO';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 
 @Controller('admin-auth')
 export class AdminAuthController {
   constructor(private crudService: CrudService) {}
+
+  @ApiTags('ADMIN-AUTH')
+  @Get('admintypes')
+  getAdminTypes() {
+    return this.crudService.getAllAdminTypes();
+  }
+
+  @ApiTags('ADMIN-AUTH')
+  @ApiBody({ type: CreateRoleDTO })
+  @Post('create-role')
+  //@UseGuards(AdminAuthGuard)
+  createAdminRole(@Body() body: CreateRoleDTO) {
+    return this.crudService.createAdminRole(body.name as any);
+  }
 
   @ApiTags('ADMIN-AUTH')
   @ApiBody({ type: AdminLoginDTO })

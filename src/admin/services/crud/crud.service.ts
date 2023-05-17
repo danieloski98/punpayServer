@@ -46,21 +46,12 @@ export class CrudService {
     };
   }
 
-  async updatePermissions(id: string, permissionsUpdate: string[]) {
+  async updatePermissions(id: string, permissionsUpdate: string) {
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (admin === null) {
       throw new BadRequestException('Admin not found');
     }
     // update permissions
-    const permissions = [];
-    if (permissionsUpdate.length > 3) {
-      throw new BadRequestException("Can't have more than 3 roles");
-    }
-    for (let i = 0; i < admin.roles.length; i++) {
-      if (permissionsUpdate.includes(admin.roles[i])) {
-        continue;
-      } else {
-      }
-    }
+    await this.adminRepo.update({ id }, { role: permissionsUpdate });
   }
 }

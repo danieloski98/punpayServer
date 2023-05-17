@@ -22,6 +22,7 @@ import { VerificationModule } from './verification/verification.module';
 import { NotificationsService } from './global-services/notifications/notifications.service';
 import { NotificationModule } from './notification/notification.module';
 import { BullModule } from '@nestjs/bull';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BullModule } from '@nestjs/bull';
     //   isGlobal: true,
     //   ttl: 60,
     // }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRoot(dataSourceOptions),
     ConfigModule.forRoot({
       isGlobal: true,

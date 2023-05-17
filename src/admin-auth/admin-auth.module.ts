@@ -9,10 +9,16 @@ import { CrudService as AdminCrudService } from '../admin/services/crud/crud.ser
 import { OtpService } from 'src/global-services/otp/otp.service';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { OtpEntity } from 'src/user-auth/Entity/otp.entity';
+import { AdminTypeEntity } from './Entities/AdminType.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdminEntity, UserEntity, OtpEntity]),
+    TypeOrmModule.forFeature([
+      AdminEntity,
+      UserEntity,
+      OtpEntity,
+      AdminTypeEntity,
+    ]),
     UserAuthModule,
   ],
   controllers: [AdminAuthController],
