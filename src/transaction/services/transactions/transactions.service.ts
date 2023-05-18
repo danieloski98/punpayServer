@@ -18,6 +18,8 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { EmailService } from 'src/global-services/email/email.service';
 import { quidax } from 'src/UTILS/quidax';
+import { NotificationService } from 'src/notification/notification.service';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 
 @Injectable()
 export class TransactionsService {
@@ -30,6 +32,7 @@ export class TransactionsService {
     private httpService: HttpService,
     private configService: ConfigService,
     private emailService: EmailService,
+    private notificationService: NotificationService,
   ) {}
 
   async getTransactionById(id: string) {
@@ -435,6 +438,12 @@ export class TransactionsService {
         Your transaction with ID ${transaction.id} has been confirmed,
         and your funds have been deposited into your account.
       `,
+      );
+      // send notification
+      this.notificationService.sendUserNotification(
+        user.id,
+        `Your transaction with ID ${transaction.id} has been confirmed`,
+        `Your transaction has benn completed`,
       );
       return {
         message: 'Transaction approved',

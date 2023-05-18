@@ -9,7 +9,13 @@ export class NotificationEntity {
   userId: string;
 
   @Column({ type: 'boolean', default: false })
+  isGeneral: boolean;
+
+  @Column({ type: 'boolean', default: false })
   isAdmin: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  adminType: string;
 
   @Column({ type: 'varchar', nullable: false })
   title: string;

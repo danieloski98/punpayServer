@@ -17,6 +17,8 @@ import { randomUUID } from 'crypto';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { GetCoinModel } from 'src/Models/GetCoinModel';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { NotificationService } from 'src/notification/notification.service';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 
 @Injectable()
 export class SwapService {
@@ -27,6 +29,7 @@ export class SwapService {
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     private httpService: HttpService,
     private sellService: SellService,
+    private notificationService: NotificationService,
   ) {}
 
   async swapTransaction(payload: SwapDTO) {
@@ -77,6 +80,12 @@ export class SwapService {
         })
         .save();
       console.log(transaction);
+      // send notification
+      this.notificationService.sendAdminNotification(
+        `New Transaction created`,
+        `A user has initiated a swap transaction`,
+        ADMINROLE.TRANSACTIONS,
+      );
       return {
         message: 'Transaction is processing',
         data: transaction,

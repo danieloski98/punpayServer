@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { VerificationService } from './verification.service';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';

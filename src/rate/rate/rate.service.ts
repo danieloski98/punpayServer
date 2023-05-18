@@ -7,6 +7,7 @@ import { RATE_CURRENCY, SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 import { HttpService } from '@nestjs/axios';
 import { SwapPercentageEntity } from '../swappercentage.entity';
 import { CreateSwapPercentageDTO } from '../dto/createSwapPercentage.DTO';
+import { NotificationEntity } from 'src/notification/notification.entity';
 
 @Injectable()
 export class RateService {
@@ -14,6 +15,8 @@ export class RateService {
     @InjectRepository(RateEntity) private rateRepo: Repository<RateEntity>,
     @InjectRepository(SwapPercentageEntity)
     private swapRepo: Repository<SwapPercentageEntity>,
+    @InjectRepository(NotificationEntity)
+    private notificationRepo: Repository<NotificationEntity>,
     private httpService: HttpService,
   ) {}
 
@@ -39,6 +42,14 @@ export class RateService {
     if (swap.length < 1) {
       throw new BadRequestException('Swap Percentage has nott been created');
     }
+
+    const notification = this.notificationRepo.create({
+      isGeneral: true,
+      isAdmin: false,
+      title: 'Swap perrcentage changed',
+      body: `Swap perrcentage has been updated to ${payload.percentage}`,
+    });
+    await this.notificationRepo.save(notification);
 
     // updated the  swap rate
     await this.swapRepo.update(
@@ -128,6 +139,14 @@ export class RateService {
     }
 
     await this.rateRepo.update({ id }, { rate });
+
+    const notification = this.notificationRepo.create({
+      isGeneral: true,
+      isAdmin: false,
+      title: `${exists.type.toUpperCase()} rate change`,
+      body: `${exists.type.toUpperCase()} rate has been updated to ${rate}`,
+    });
+    await this.notificationRepo.save(notification);
 
     return {
       message: `currency ${exists.currency} rate updated`,
