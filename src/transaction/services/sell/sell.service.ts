@@ -16,6 +16,8 @@ import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
+import { NotificationService } from 'src/notification/notification.service';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
@@ -28,6 +30,7 @@ export class SellService {
     @InjectRepository(BankEntity) private bankRepo: Repository<BankEntity>,
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     private httpService: HttpService,
+    private notificationService: NotificationService,
   ) {}
 
   async fetchAdminAddress(currency: string) {
@@ -98,6 +101,12 @@ export class SellService {
             })
             .save();
           console.log(transaction);
+          // send notification
+          this.notificationService.sendAdminNotification(
+            `New Transaction created`,
+            `A user has initiate a sell transaction`,
+            ADMINROLE.TRANSACTIONS,
+          );
           return {
             message: 'Transaction is processing',
             data: transaction,

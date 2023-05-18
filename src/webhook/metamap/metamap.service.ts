@@ -7,6 +7,8 @@ import { createHmac, timingSafeEqual } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { VerificationService } from 'src/verification/verification.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NotificationService } from 'src/notification/notification.service';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 
 @Injectable()
 export class MetamapService {
@@ -16,6 +18,7 @@ export class MetamapService {
     private configService: ConfigService,
     private verificationService: VerificationService,
     private eventEmitter: EventEmitter2,
+    private notificationService: NotificationService,
   ) {}
 
   private async verify(signature, payloadBody) {
@@ -50,6 +53,13 @@ export class MetamapService {
 
           // emit email event
           this.eventEmitter.emit('VERIFICATION_SUBMITTED', metadata);
+
+          // send notification
+          this.notificationService.sendAdminNotification(
+            'Verification Submitted',
+            `A verification has been submitted for user with email ${metadata.metadata.email}`,
+            ADMINROLE.VERIFICATION,
+          );
         }
         break;
       }

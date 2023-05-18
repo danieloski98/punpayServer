@@ -4,10 +4,11 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotificationEntity } from './notification-entity';
+import { NotificationEntity } from './notification.entity';
 import { Repository } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import { Notification_Url } from 'src/UTILS/urls';
+import { union } from 'lodash';
 interface CreateNotification {
   isAdmin: boolean;
   userId?: string;
@@ -25,15 +26,14 @@ export class NotificationService {
 
   async sendGeneralNotification(title: string, body: string) {
     try {
-      const res = await this.httpService.axiosRef.post(Notification_Url, {
-        appId: process.env.NATIVE_NOTIFY_ID,
-        appToken: process.env.NATIVE_NOTIFY_TOKEN,
+      const Notification = this.notiRepo.create({
+        isGeneral: true,
         title,
         body,
-        dateSent: new Date().toISOString(),
       });
 
-      console.log(res.data);
+      await this.notiRepo.save(Notification);
+
       return {
         message: 'notification sent',
       };
@@ -42,46 +42,94 @@ export class NotificationService {
     }
   }
 
-  async sendNotifiication(body: CreateNotification) {
-    if (!body.isAdmin && !body.userId) {
-      throw new BadRequestException('invalid option object');
-    }
-    const newObj = this.notiRepo.create(body);
-    await this.notiRepo.save(newObj);
+  async sendUserNotification(userId: string, title: string, body: string) {
+    try {
+      const Notification = this.notiRepo.create({
+        isAdmin: false,
+        isGeneral: false,
+        userId,
+        title,
+        body,
+      });
 
-    if (!body.isAdmin) {
-      await this.httpService.axiosRef.post(
-        `https://app.nativenotify.com/api/indie/notification`,
-        {
-          subID: body.userId,
-          appId: process.env.NATIVE_NOTIFY_ID,
-          appToken: process.env.NATIVE_NOTIFY_TOKEN,
-          title: body.title,
-          message: body.body,
-        },
-      );
-    }
+      await this.notiRepo.save(Notification);
 
-    return {
-      message: 'notification sent',
-    };
+      return {
+        message: 'notification sent',
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async sendAdminNotification(
+    title: string,
+    body: string,
+    adminType: string = null,
+  ) {
+    try {
+      if (adminType === null) {
+        const Notification = this.notiRepo.create({
+          isAdmin: true,
+          isGeneral: true,
+          adminType: '',
+          title,
+          body,
+        });
+
+        await this.notiRepo.save(Notification);
+
+        return {
+          message: 'notification sent',
+        };
+      }
+      const Notification = this.notiRepo.create({
+        isAdmin: true,
+        isGeneral: false,
+        adminType,
+        title,
+        body,
+      });
+
+      await this.notiRepo.save(Notification);
+
+      return {
+        message: 'notification sent',
+      };
+    } catch (error: any) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
   async getUserNotifications(userId: string) {
-    const notifications = await this.notiRepo.find({ where: { userId } });
-    return {
-      message: 'notifications',
-      data: notifications,
-    };
-  }
-
-  async getAdminNotifications() {
     const notifications = await this.notiRepo.find({
-      where: { isAdmin: true },
+      where: [{ userId }, { isGeneral: true, isAdmin: false }],
     });
     return {
       message: 'notifications',
-      data: notifications,
+      data: union([notifications]),
+    };
+  }
+
+  async getAdminNotifications(adminType: string = null) {
+    if (adminType === null) {
+      const notifications = await this.notiRepo.find({
+        where: [{ isGeneral: true }, { isAdmin: true }],
+      });
+      return {
+        message: 'notifications',
+        data: notifications,
+      };
+    }
+    const notifications = await this.notiRepo.find({
+      where: [
+        { adminType, isAdmin: true },
+        { isGeneral: true, isAdmin: true },
+      ],
+    });
+    return {
+      message: 'notifications',
+      data: union([notifications]),
     };
   }
 

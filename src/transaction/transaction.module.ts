@@ -13,6 +13,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { EmailService } from 'src/global-services/email/email.service';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EmailService } from 'src/global-services/email/email.service';
       AdminEntity,
     ]),
     HttpModule.register({}),
+    NotificationModule,
     // HttpService,
   ],
   controllers: [TransactionController],

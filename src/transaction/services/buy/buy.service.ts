@@ -6,12 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RateEntity } from 'src/Entities/rate.entity';
+import { ADMINROLE } from 'src/Enums/AdminRoles';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { GetCoinModel } from 'src/Models/GetCoinModel';
 import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
+import { NotificationService } from 'src/notification/notification.service';
 import { BuyDTO } from 'src/transaction/dto/Buy.dto';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { TRANSACTIONTYPE } from 'src/types/transactionType';
@@ -28,6 +30,7 @@ export class BuyService {
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private httpService: HttpService,
+    private notificationService: NotificationService,
   ) {}
 
   async initiateBuy(payload: BuyDTO) {
@@ -48,6 +51,13 @@ export class BuyService {
         transactionType: TRANSACTION_TYPE.BUY,
       })
       .save();
+
+    // send notification
+    this.notificationService.sendAdminNotification(
+      `New Transaction created`,
+      `A user has initiate a buy transaction`,
+      ADMINROLE.TRANSACTIONS,
+    );
     return {
       message: 'Transaction created',
       data: transaction,
