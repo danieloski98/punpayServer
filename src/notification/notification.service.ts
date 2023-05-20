@@ -107,7 +107,7 @@ export class NotificationService {
     });
     return {
       message: 'notifications',
-      data: union([notifications]),
+      data: union(notifications),
     };
   }
 
@@ -129,13 +129,13 @@ export class NotificationService {
     });
     return {
       message: 'notifications',
-      data: union([notifications]),
+      data: union(notifications),
     };
   }
 
   async deleteNotification(id: string) {
     const notification = await this.notiRepo.findOne({ where: { id } });
-    if (notification) {
+    if (notification === null) {
       throw new BadRequestException('Notification not found');
     }
 

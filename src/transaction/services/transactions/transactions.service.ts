@@ -148,13 +148,13 @@ export class TransactionsService {
 
   async getTransactionByUserId(id: string) {
     const data = await this.transactionRepo.findOne({
-      where: { userId: id },
+      where: { id },
       relations: ['user'],
     });
     if (data === null) {
       throw new BadRequestException('Transaction not found');
     }
-    const user = await this.userRepo.findOne({ where: { id } });
+    const user = await this.userRepo.findOne({ where: { id: data.userId } });
     if (user === null) {
       throw new BadRequestException('user not found');
     }
@@ -442,8 +442,8 @@ export class TransactionsService {
       // send notification
       this.notificationService.sendUserNotification(
         user.id,
-        `Your transaction with ID ${transaction.id} has been confirmed`,
         `Your transaction has benn completed`,
+        `Your transaction with ID ${transaction.id} has been confirmed`,
       );
       return {
         message: 'Transaction approved',
