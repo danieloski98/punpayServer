@@ -46,12 +46,16 @@ export class CrudService {
     };
   }
 
-  async updatePermissions(id: string, permissionsUpdate: string) {
+  async updatePermissions(id: string, permissionsUpdate: string[]) {
     const admin = await this.adminRepo.findOne({ where: { id } });
     if (admin === null) {
       throw new BadRequestException('Admin not found');
     }
     // update permissions
-    await this.adminRepo.update({ id }, { role: permissionsUpdate });
+    await this.adminRepo.update({ id }, { roles: permissionsUpdate });
+
+    return {
+      message: 'Roles updated',
+    };
   }
 }
