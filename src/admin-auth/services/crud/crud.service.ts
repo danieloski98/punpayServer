@@ -142,7 +142,7 @@ export class CrudService {
       password,
       bio: payload.bio,
       fullname: payload.fullname,
-      role: payload.role,
+      roles: payload.roles,
     };
     console.log(obj);
     const data = await this.adminRepo.create(obj).save();

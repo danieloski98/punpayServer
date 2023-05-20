@@ -5,7 +5,7 @@ import { ADMINROLE } from 'src/Enums/AdminRoles';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { EmailService } from 'src/global-services/email/email.service';
 import { MetaMapDTO } from 'src/webhook/metamap/metamap.dto';
-import { Repository } from 'typeorm';
+import { Repository, In, ArrayContains } from 'typeorm';
 
 @Injectable()
 export class EventsService {
@@ -16,8 +16,14 @@ export class EventsService {
 
   @OnEvent('VERIFICATION_SUBMITTED')
   async sendAdminsEmail(data: MetaMapDTO) {
+    // const admins = await this.adminRepo
+    //   .createQueryBuilder()
+    //   .where('roles CONTAINS :roles', {
+    //     roles: ArrayContains([ADMINROLE.VERIFICATION]),
+    //   })
+    //   .getMany();
     const admins = await this.adminRepo.find({
-      where: { role: ADMINROLE.VERIFICATION },
+      where: { roles: ArrayContains([ADMINROLE.VERIFICATION]) },
     });
     if (admins.length) {
       for (let i = 0; i < admins.length; i++) {

@@ -21,5 +21,5 @@ export class CreateAccountDTO {
   @ApiProperty({ isArray: true })
   @Type(() => Array<string>)
   @IsNotEmpty()
-  roles: string;
+  roles: string[];
 }
