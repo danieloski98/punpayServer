@@ -4,8 +4,6 @@ import { Verification } from './verification.entity';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { CreateVerifcationDTO } from './dto/create-verification-dto';
-import { OnEvent } from '@nestjs/event-emitter';
-import { MetaMapDTO } from '../webhook/metamap/metamap.dto';
 import { EmailService } from 'src/global-services/email/email.service';
 import { VERIFICATION_STATUS } from 'src/Enums/VerificationStatus';
 
