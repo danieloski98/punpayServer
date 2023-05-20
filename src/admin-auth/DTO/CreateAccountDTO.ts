@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class CreateAccountDTO {
   @ApiProperty()
@@ -17,8 +18,8 @@ export class CreateAccountDTO {
   @IsString()
   fullname: string;
 
-  @ApiProperty({ isArray: false })
-  @IsString()
+  @ApiProperty({ isArray: true })
+  @Type(() => Array<string>)
   @IsNotEmpty()
-  role: string;
+  roles: string;
 }
