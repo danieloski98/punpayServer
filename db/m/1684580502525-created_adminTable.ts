@@ -8,8 +8,7 @@ export class createdAdminTable1684580502525 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`Admin\` (\`id\` varchar(36) NOT NULL, \`email\` varchar(255) NOT NULL, \`password\` varchar(255) NOT NULL, \`fullname\` varchar(255) NOT NULL, \`bio\` varchar(255) NOT NULL, \`roles\` text NOT NULL, \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:44.268Z', \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:44.268Z', PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`SwapPercentage\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:43.518Z'`);
         await queryRunner.query(`ALTER TABLE \`SwapPercentage\` CHANGE \`updatededAt\` \`updatededAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:43.518Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:43.516Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:43.516Z'`);
+
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:44.265Z'`);
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:44.265Z'`);
         await queryRunner.query(`ALTER TABLE \`Bank\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T11:01:44.267Z'`);

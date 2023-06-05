@@ -5,8 +5,6 @@ export class accountDisabled1682194391446 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`accountDisbaled\` \`accountDisabled\` tinyint NOT NULL DEFAULT '0'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:13:11.950Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:13:11.950Z'`);
         await queryRunner.query(`ALTER TABLE \`Admin\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:13:12.310Z'`);
         await queryRunner.query(`ALTER TABLE \`Admin\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:13:12.310Z'`);
         await queryRunner.query(`ALTER TABLE \`Transaction\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:13:12.311Z'`);
@@ -38,8 +36,6 @@ export class accountDisabled1682194391446 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`Transaction\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:10:09.532Z'`);
         await queryRunner.query(`ALTER TABLE \`Admin\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:10:09.531Z'`);
         await queryRunner.query(`ALTER TABLE \`Admin\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:10:09.531Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:10:09.728Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:10:09.728Z'`);
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`accountDisabled\` \`accountDisbaled\` tinyint NOT NULL DEFAULT '0'`);
     }
 

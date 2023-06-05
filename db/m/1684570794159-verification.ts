@@ -5,8 +5,7 @@ export class verification1684570794159 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`VerificationDetails\` (\`id\` varchar(36) NOT NULL, \`userId\` varchar(255) NOT NULL, \`link\` varchar(255) NOT NULL, \`metadata\` text NULL, \`approvedBy\` varchar(255) NULL, \`status\` varchar(255) NULL DEFAULT 'PENDING', \`createdAt\` varchar(255) NOT NULL DEFAULT 'Sat May 20 2023', \`updatedAt\` varchar(255) NOT NULL DEFAULT 'Sat May 20 2023', PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T08:19:55.364Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T08:19:55.364Z'`);
+
         await queryRunner.query(`ALTER TABLE \`Notification\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT 'Sat May 20 2023'`);
         await queryRunner.query(`ALTER TABLE \`SwapPercentage\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T08:19:55.367Z'`);
         await queryRunner.query(`ALTER TABLE \`SwapPercentage\` CHANGE \`updatededAt\` \`updatededAt\` varchar(255) NOT NULL DEFAULT '2023-05-20T08:19:55.368Z'`);

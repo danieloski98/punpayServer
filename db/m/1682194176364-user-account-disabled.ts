@@ -5,8 +5,6 @@ export class userAccountDisabled1682194176364 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`ALTER TABLE \`User\` ADD \`accountDisbaled\` tinyint NOT NULL DEFAULT 0`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:09:37.643Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:09:37.643Z'`);
         await queryRunner.query(`ALTER TABLE \`VerificationDetails\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT 'Sat Apr 22 2023'`);
         await queryRunner.query(`ALTER TABLE \`VerificationDetails\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT 'Sat Apr 22 2023'`);
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-22T20:09:38.367Z'`);
@@ -42,8 +40,6 @@ export class userAccountDisabled1682194176364 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`User\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-21T21:58:40.101Z'`);
         await queryRunner.query(`ALTER TABLE \`VerificationDetails\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT 'Fri Apr 21 2023'`);
         await queryRunner.query(`ALTER TABLE \`VerificationDetails\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT 'Fri Apr 21 2023'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-04-21T21:58:40.329Z'`);
-        await queryRunner.query(`ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-04-21T21:58:40.329Z'`);
         await queryRunner.query(`ALTER TABLE \`User\` DROP COLUMN \`accountDisbaled\``);
     }
 

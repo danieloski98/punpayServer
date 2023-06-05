@@ -7,10 +7,10 @@ console.log(process.env.NODE_ENV);
 
 export const dataSourceOptions: DataSourceOptions = {
   type: 'mysql',
-  host:
-    process.env.NODE_ENV === 'development' ? 'localhost' : process.env.DB_PORT,
-  username: 'daniel',
-  password: process.env.NODE_ENV === 'development' ? 'Daniel98$' : 'daniel98',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  port: +process.env.DB_PORT,
   database: 'punpay',
   entities: ['./dist/**/*.entity.js'],
   synchronize: false,
