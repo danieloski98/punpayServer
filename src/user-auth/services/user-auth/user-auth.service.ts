@@ -20,7 +20,6 @@ import { PasswordResetDTO } from 'src/user-auth/DTO/PasswordReset';
 import { BalanceEntity } from 'src/user/Entities/balance.entity';
 import { HttpService } from '@nestjs/axios';
 import { CoinService } from 'src/coin/services/coin/coin.service';
-import fluidcoins from 'src/UTILS/fluidcoin';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -70,13 +69,13 @@ export class UserAuthService {
       if (account !== null) {
         throw new BadRequestException('Email already in use');
       }
-      // const data = await quidax.users.create({
-      //   email: user.email,
-      //   first_name: user.firstName,
-      //   last_name: user.lastName,
-      // });
+      const data = await quidax.users.create({
+        email: user.email,
+        first_name: user.firstName,
+        last_name: user.lastName,
+      });
 
-      // console.log(data);
+      console.log(data);
 
       console.log(`This is from acount creation`);
 
@@ -86,8 +85,8 @@ export class UserAuthService {
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          quidaxId: 'bc5m64wl',
-          // quidaxId: data.data.id,
+          // quidaxId: 'bc5m64wl',
+          quidaxId: data.data.id,
           password: user.password,
         };
         const newUser = await this.userRepo.create(obj).save();
