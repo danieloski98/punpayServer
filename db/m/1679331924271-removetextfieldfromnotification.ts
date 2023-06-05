@@ -7,12 +7,6 @@ export class removetextfieldfromnotification1679331924271
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T17:05:26.247Z'`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T17:05:26.247Z'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE \`Admin\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T17:05:27.562Z'`,
     );
     await queryRunner.query(
@@ -98,12 +92,6 @@ export class removetextfieldfromnotification1679331924271
     );
     await queryRunner.query(
       `ALTER TABLE \`Admin\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T16:56:48.618Z'`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T16:56:49.173Z'`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-03-20T16:56:49.173Z'`,
     );
   }
 }

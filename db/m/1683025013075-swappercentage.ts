@@ -5,12 +5,6 @@ export class swappercentage1683025013075 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-02T10:56:53.631Z'`,
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`Rate\` CHANGE \`updatedAt\` \`updatedAt\` varchar(255) NOT NULL DEFAULT '2023-05-02T10:56:53.631Z'`,
-    );
-    await queryRunner.query(
       `ALTER TABLE \`SwapPercentage\` CHANGE \`createdAt\` \`createdAt\` varchar(255) NOT NULL DEFAULT '2023-05-02T10:56:53.632Z'`,
     );
     await queryRunner.query(
