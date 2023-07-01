@@ -13,7 +13,7 @@ export const dataSourceOptions: DataSourceOptions = {
   port: +process.env.DB_PORT,
   database: 'punpay',
   entities: ['./dist/**/*.entity.js'],
-  synchronize: false,
+  synchronize: true,
   migrations: ['./dist/db/migrations/*.js'],
   ssl:
     process.env.NODE_ENV === 'development'

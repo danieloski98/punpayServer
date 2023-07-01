@@ -27,11 +27,11 @@ export class SendService {
   ) {}
 
   async sendCrypto(payload: SendDTO) {
+    console.log(payload);
     // verify the user
     const user = await this.userRepo.findOne({
       where: { id: payload.userId },
     });
-    console.log(user);
     if (user === null) {
       throw new BadRequestException('User not found');
     }
@@ -39,7 +39,7 @@ export class SendService {
       throw new BadRequestException('Currency not supported');
     }
     // get withdrawalFee
-    let fee = 0;
+    let fee = '0';
     let wallet;
     try {
       // Get Admin address for the tranfer
@@ -54,34 +54,32 @@ export class SendService {
           },
         },
       );
-      console.log(fees.data);
       if (fees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
       wallet = fees.data.data.address;
+      console.log(fees.data.data);
     } catch (error) {
-      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
     try {
       // Validate wallet address
-      const fees = await this.httpService.axiosRef.get(
+      const transactionfees = await this.httpService.axiosRef.get(
         `https://www.quidax.com/api/v1/fee?currency=${payload.transactionCurrency}`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${this.configService.get<string>(
               'QDX_SECRET',
             )}`,
           },
         },
       );
-      console.log(fees.data);
-      if (fees.data.status !== 'success') {
+      if (transactionfees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
-      fee = fees.data.data.fee;
+      fee = transactionfees.data.data.fee;
     } catch (error) {
-      console.log(error.message);
       throw new InternalServerErrorException(error.message);
     }
 
@@ -97,12 +95,13 @@ export class SendService {
         },
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
       );
     } catch (error) {
-      console.log(error);
+      console.log(`this is from the admin transfer`);
       throw new InternalServerErrorException(error.message);
     }
 
@@ -112,16 +111,15 @@ export class SendService {
         `https://www.quidax.com/api/v1/${payload.transactionCurrency}/${payload.withdrawalAddress}/validate_address`,
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
       );
-      console.log(addressValid.data);
       if (addressValid.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
     } catch (error) {
-      console.log(error);
       throw new InternalServerErrorException(error.message);
     }
 
@@ -130,12 +128,13 @@ export class SendService {
         `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
         {
           currency: payload.transactionCurrency,
-          amount: payload.transactionAmount,
+          amount: payload.transactionAmount.toString(),
           fund_uid: payload.withdrawalAddress,
           transaction_note: `withrawal of ${payload.transactionAmount}-${payload.transactionCurrency}`,
         },
         {
           headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
             authorization: `Bearer ${process.env.QDX_SECRET}`,
           },
         },
@@ -154,13 +153,15 @@ export class SendService {
         })
         .save();
       console.log(transaction);
+      console.log(`this is from the normal transfer`);
+
       return {
         data: transaction,
         // ...response.data,
       };
     } catch (error) {
-      console.log(error);
       //throw new InternalServerErrorException(error.message);
+      console.log(`this is from the normal transfer`);
       throw new InternalServerErrorException(error.response.data.message);
     }
   }

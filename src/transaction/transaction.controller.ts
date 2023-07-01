@@ -9,7 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { SellService } from './services/sell/sell.service';
-import { ApiBody, ApiParam, ApiTags, PartialType } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+  PartialType,
+} from '@nestjs/swagger';
 import { SellDTO } from './dto/sell.dto';
 import { SendDTO } from './dto/send.dto';
 import { SendService } from './services/send/send.service';
@@ -120,9 +126,16 @@ export class TransactionController {
 
   @UseGuards(AuthorizationGuard)
   @ApiParam({ name: 'currency' })
+  @ApiQuery({ name: 'quidax' })
   @Get('withdrawal-fee/:currency')
-  getWithdrawalFees(@Param('currency') param: string) {
-    return this.transactionService.getFees(param);
+  getWithdrawalFees(
+    @Param('currency') param: string,
+    @Query('quidax') quidax: string,
+  ) {
+    return this.transactionService.getFees(
+      param,
+      quidax === 'true' ? true : false,
+    );
   }
 
   @UseGuards(AuthorizationGuard)

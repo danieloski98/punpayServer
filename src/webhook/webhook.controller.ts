@@ -20,6 +20,6 @@ export class WebhookController {
   @Post('metamap')
   handleMetamapWebhook(@Body() body: any, @Req() req: Request) {
     console.log(req.headers);
-    return this.metaMapService.getMeta(body);
+    return this.metaMapService.getMeta();
   }
 }

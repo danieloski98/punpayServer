@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Verification } from './verification.entity';
 import { Repository } from 'typeorm';
@@ -6,6 +10,10 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { CreateVerifcationDTO } from './dto/create-verification-dto';
 import { EmailService } from 'src/global-services/email/email.service';
 import { VERIFICATION_STATUS } from 'src/Enums/VerificationStatus';
+import { UploadDto } from './dto/upload-dto';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import Cloudinary from 'src/cloudinary';
 
 @Injectable()
 export class VerificationService {
@@ -14,6 +22,8 @@ export class VerificationService {
     private verificationRepo: Repository<Verification>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private emailService: EmailService,
+    private httpService: HttpService,
+    private config: ConfigService,
   ) {}
 
   async checkVerification(userId: string): Promise<boolean> {
@@ -23,34 +33,6 @@ export class VerificationService {
     } else {
       return false;
     }
-  }
-
-  async createVerification(payload: CreateVerifcationDTO) {
-    const user = await this.userRepo.findOne({ where: { id: payload.userId } });
-    if (user === null) {
-      throw new BadRequestException('User not found');
-    }
-    // check if the user has a verification uploaded
-    const verification = await this.verificationRepo.findOne({
-      where: { userId: payload.userId },
-    });
-    if (verification !== null) {
-      throw new BadRequestException(
-        'You already have a verification in progress',
-      );
-    }
-    // create verification entry
-    const newEntry = this.verificationRepo.create({
-      userId: payload.userId,
-      link: payload.link,
-      metadata: { ...payload.metadata },
-    });
-
-    await this.verificationRepo.save(newEntry);
-
-    return {
-      message: 'verification uploaded and is processing',
-    };
   }
 
   async getAllVerificattion(filter = 'All') {
@@ -164,5 +146,85 @@ export class VerificationService {
       message: 'Document approved',
       data: verificationEntry,
     };
+  }
+
+  async uploadVerificationDoc(
+    userId: string,
+    payload: UploadDto,
+    file: {
+      front?: Express.Multer.File[];
+      back?: Express.Multer.File[];
+    },
+  ) {
+    try {
+      console.log(file.front);
+      console.log(payload);
+      const user = await this.userRepo.findOne({ where: { id: userId } });
+      let back;
+
+      if (user === null) {
+        throw new BadRequestException('User not found');
+      }
+
+      const verificationEntry = await this.verificationRepo.findOne({
+        where: {
+          userId,
+        },
+      });
+
+      if (verificationEntry !== null) {
+        // verrification
+        if (verificationEntry.status === VERIFICATION_STATUS.PENDING) {
+          throw new BadRequestException(
+            'Document already uploaded and awaiting approval',
+          );
+        }
+
+        // upload front
+        const front = await Cloudinary.uploader.upload(file.front[0].path);
+        // if (file.back) {
+        //   const url = await Cloudinary.uploader.upload(file.back[0].path);
+        //   back = url.secure_url;
+        // }
+
+        const verification = this.verificationRepo.create({
+          userId: userId,
+          front: front.secure_url,
+          back: back ?? '',
+          doc_type: payload.doc_type,
+        });
+
+        await this.verificationRepo.save(verification);
+
+        return {
+          message: `Verification document uploaded`,
+        };
+      }
+
+      // upload front
+      const front = await Cloudinary.uploader.upload(file.front[0].path);
+      // if (file.back) {
+      //   const url = await Cloudinary.uploader.upload(file.back[0].path);
+      //   back = url.secure_url;
+      // }
+
+      // create verification entry
+
+      const verification = this.verificationRepo.create({
+        userId: userId,
+        front: front.secure_url,
+        back: front.secure_url,
+        doc_type: payload.doc_type,
+      });
+
+      await this.verificationRepo.save(verification);
+
+      return {
+        message: 'Verrification uploaded',
+      };
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(`An errorr occured`);
+    }
   }
 }

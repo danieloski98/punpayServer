@@ -28,54 +28,5 @@ export class MetamapService {
     return timingSafeEqual(Buffer.from(hashString), Buffer.from(signature));
   }
 
-  async getMeta(metadata: MetaMapDTO) {
-    switch (metadata.eventName) {
-      case 'step_completed': {
-        break;
-      }
-      case 'verification_completed': {
-        // check if the user has verification
-        const hasVerification =
-          await this.verificationService.checkVerification(
-            metadata.metadata.userId,
-          );
-
-        if (hasVerification) {
-          break;
-        } else {
-          // create the verification
-          const verification =
-            await this.verificationService.createVerification({
-              link: metadata.resource,
-              metadata: metadata.metadata,
-              userId: metadata.metadata.userId,
-            });
-
-          // emit email event
-          this.eventEmitter.emit('VERIFICATION_SUBMITTED', metadata);
-
-          // send notification
-          this.notificationService.sendAdminNotification(
-            'Verification Submitted',
-            `A verification has been submitted for user with email ${metadata.metadata.email}`,
-            ADMINROLE.VERIFICATION,
-          );
-        }
-        break;
-      }
-      case 'verification_input_completed': {
-        break;
-      }
-
-      case 'verification_started': {
-        break;
-      }
-
-      case 'verification_updated': {
-        break;
-      }
-    }
-
-    return { message: 'data recieved' };
-  }
+  async getMeta() {}
 }
