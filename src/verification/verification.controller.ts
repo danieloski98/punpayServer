@@ -1,11 +1,16 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
   Param,
+  Post,
   Put,
   Query,
+  UploadedFile,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { VerificationService } from './verification.service';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
@@ -13,6 +18,11 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { User } from 'src/decorators/user.decorator';
 import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
+import { UploadDto } from './dto/upload-dto';
 
 @ApiTags('VERIFICATION')
 @Controller('verification')
@@ -58,5 +68,27 @@ export class VerificationController {
   @UseGuards(AdminAuthGuard)
   deleteveification(@Param('userId') userId: string) {
     return this.verificationService.rejecttDocument(userId);
+  }
+
+  @Post(':userId')
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'front', maxCount: 1 },
+        { name: 'back', maxCount: 1 },
+      ],
+      { dest: './verification' },
+    ),
+  )
+  uploadDocument(
+    @Param('userId') id: string,
+    @UploadedFiles()
+    file: {
+      front?: Express.Multer.File[];
+      back?: Express.Multer.File[];
+    },
+    @Body() body: UploadDto,
+  ) {
+    return this.verificationService.uploadVerificationDoc(id, body, file);
   }
 }

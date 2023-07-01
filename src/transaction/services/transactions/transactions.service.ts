@@ -345,7 +345,7 @@ export class TransactionsService {
     };
   }
 
-  async getFees(currency: string) {
+  async getFees(currency: string, quidax?: boolean) {
     try {
       // Validate wallet address
       const fees = await this.httpService.axiosRef.get(
@@ -365,7 +365,7 @@ export class TransactionsService {
       }
       const fee = fees.data.data.fee * 2;
       return {
-        data: { fee: fee },
+        data: { fee: quidax ? fees.data.data.fee : fee },
       };
     } catch (error) {
       console.log(error.message);

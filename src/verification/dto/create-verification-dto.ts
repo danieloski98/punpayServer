@@ -11,16 +11,10 @@ export class CreateVerifcationDTO {
   userId: string;
 
   @Expose()
-  @IsObject()
+  @IsString()
   @IsNotEmpty()
   @ApiProperty({
     description: 'object containing the user details',
   })
-  metadata: Record<string, any>;
-
-  @Expose()
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty()
-  link: string;
+  doc_type: Record<string, any>;
 }

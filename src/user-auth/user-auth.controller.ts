@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Param,
   Post,
   Put,
@@ -21,6 +22,7 @@ import { UpdatePinDTO } from './DTO/Updatepin.dto';
 @Controller('user-auth')
 @ApiTags('USER-AUTH')
 export class UserAuthController {
+  private logger = new Logger(UserAuthController.name);
   constructor(private userService: UserAuthService) {}
 
   @ApiBody({ type: CreateAccountDTO })
@@ -82,8 +84,10 @@ export class UserAuthController {
 
   @UseGuards(AuthorizationGuard)
   @ApiBody({ type: PinDTO })
-  @Put('verify-pin')
-  verifypin(@Body() body: PinDTO) {
+  @Put('pin/verify-pin')
+  verifypin(@Body() body: any) {
+    this.logger.error(`this is from the verify pin page`);
+    this.logger.debug(body);
     return this.userService.verifyPin(body);
   }
 

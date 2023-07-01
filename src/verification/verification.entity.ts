@@ -10,10 +10,13 @@ export class Verification {
   userId: string;
 
   @Column({ type: 'varchar', nullable: false })
-  link: string;
+  doc_type: string;
 
-  @Column({ type: 'simple-json', nullable: true })
-  metadata: Record<string, any>;
+  @Column({ type: 'varchar', nullable: false })
+  front: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  back: string;
 
   @Column({ type: 'uuid', nullable: true })
   approvedBy: string;
