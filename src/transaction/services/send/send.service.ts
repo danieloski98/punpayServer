@@ -15,6 +15,7 @@ import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
 import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { randomUUID } from 'crypto';
 import { ConfigService } from '@nestjs/config';
+import { RefundserviceService } from 'src/transaction/refundservice/refundservice.service';
 
 @Injectable()
 export class SendService {
@@ -24,6 +25,7 @@ export class SendService {
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
     private httpService: HttpService,
     private configService: ConfigService,
+    private refundService: RefundserviceService,
   ) {}
 
   async sendCrypto(payload: SendDTO) {
@@ -101,7 +103,11 @@ export class SendService {
         },
       );
     } catch (error) {
-      console.log(`this is from the admin transfer`);
+      this.refundService.addRefundransaction({
+        userId: payload.userId,
+        coin: payload.transactionCurrency,
+        amount: fee,
+      });
       throw new InternalServerErrorException(error.message);
     }
 
@@ -163,6 +169,7 @@ export class SendService {
       //throw new InternalServerErrorException(error.message);
       console.log(`this is from the normal transfer`);
       throw new InternalServerErrorException(error.response.data.message);
+      // run the queue here
     }
   }
 }
