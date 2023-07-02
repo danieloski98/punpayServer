@@ -14,9 +14,14 @@ import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { EmailService } from 'src/global-services/email/email.service';
 import { NotificationModule } from 'src/notification/notification.module';
+import { BullModule } from '@nestjs/bull';
+import { RefundserviceService } from './refundservice/refundservice.service';
 
 @Module({
   imports: [
+    BullModule.registerQueue({
+      name: 'refund',
+    }),
     TypeOrmModule.forFeature([
       TransactionEntity,
       RateEntity,
@@ -36,6 +41,7 @@ import { NotificationModule } from 'src/notification/notification.module';
     SwapService,
     SendService,
     EmailService,
+    RefundserviceService,
   ],
 })
 export class TransactionModule {}
