@@ -1,5 +1,13 @@
 import { VERIFICATION_STATUS } from 'src/Enums/VerificationStatus';
-import { Entity, PrimaryGeneratedColumn, Column, AfterUpdate } from 'typeorm';
+import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  AfterUpdate,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('VerificationDetails')
 export class Verification {
@@ -38,4 +46,8 @@ export class Verification {
   async updated() {
     this.updatedAt = new Date().toDateString();
   }
+
+  @OneToOne(() => UserEntity, { cascade: true })
+  @JoinColumn({ name: 'userId' })
+  user: UserEntity;
 }

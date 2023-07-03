@@ -37,7 +37,9 @@ export class VerificationService {
 
   async getAllVerificattion(filter = 'All') {
     if (filter === 'All') {
-      const verification = await this.verificationRepo.find();
+      const verification = await this.verificationRepo.find({
+        relations: ['user'],
+      });
       return {
         message: 'All verifications',
         data: verification,
@@ -45,6 +47,7 @@ export class VerificationService {
     }
     const verification = await this.verificationRepo.find({
       where: { status: filter },
+      relations: ['user'],
     });
     return {
       message: 'All verifications',
@@ -53,7 +56,9 @@ export class VerificationService {
   }
 
   async getUserVerification(userId: string) {
-    const user = await this.userRepo.findOne({ where: { id: userId } });
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+    });
 
     if (user === null) {
       throw new BadRequestException('User not found');
@@ -61,6 +66,7 @@ export class VerificationService {
 
     const verificationEntry = await this.verificationRepo.findOne({
       where: { userId },
+      relations: ['user'],
     });
 
     if (verificationEntry === null) {

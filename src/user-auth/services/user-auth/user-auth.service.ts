@@ -62,22 +62,22 @@ export class UserAuthService {
 
   async createUser(user: CreateAccountDTO) {
     try {
-      // create quidax sub user
-      // const account = await this.userRepo.findOne({
-      //   where: { email: user.email },
-      // });
-      // if (account !== null) {
-      //   throw new BadRequestException('Email already in use');
-      // }
-      // const data = await quidax.users.create({
-      //   email: user.email,
-      //   first_name: user.firstName,
-      //   last_name: user.lastName,
-      // });
+      //create quidax sub user
+      const account = await this.userRepo.findOne({
+        where: { email: user.email },
+      });
+      if (account !== null) {
+        throw new BadRequestException('Email already in use');
+      }
+      const data = await quidax.users.create({
+        email: user.email,
+        first_name: user.firstName,
+        last_name: user.lastName,
+      });
 
-      // console.log(data);
+      console.log(data);
 
-      // console.log(`This is from acount creation`);
+      console.log(`This is from acount creation`);
 
       // if (account === null) {
       // use the quidax id to create a new user
@@ -85,8 +85,8 @@ export class UserAuthService {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        quidaxId: 'bc5m64wl',
-        // quidaxId: data.data.id,
+        // quidaxId: 'bc5m64wl',
+        quidaxId: data.data.id,
         password: user.password,
       };
       const newUser = await this.userRepo.create(obj).save();
