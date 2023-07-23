@@ -8,8 +8,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { FeeEntity } from './fees.entity';
 
 @Entity('Transaction')
 export class TransactionEntity extends BaseEntity {
@@ -95,4 +97,8 @@ export class TransactionEntity extends BaseEntity {
 
   @ManyToOne(() => BankEntity, (bank) => bank.transactions)
   adminBank: BankEntity;
+
+  @OneToOne(() => FeeEntity)
+  @JoinColumn()
+  fee: FeeEntity;
 }

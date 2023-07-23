@@ -29,4 +29,12 @@ export class Next0fkinService {
       message: 'You already have a next of Kin',
     };
   }
+
+  async getNextOfKin(userId: string) {
+    const data = await this.nextofkinRepo.findOne({ where: { userId } });
+
+    return {
+      data,
+    };
+  }
 }

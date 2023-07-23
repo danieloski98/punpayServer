@@ -16,6 +16,7 @@ import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { randomUUID } from 'crypto';
 import { ConfigService } from '@nestjs/config';
 import { RefundserviceService } from 'src/transaction/refundservice/refundservice.service';
+import { FeeEntity } from 'src/transaction/entities/fees.entity';
 
 @Injectable()
 export class SendService {
@@ -23,6 +24,7 @@ export class SendService {
     @InjectRepository(TransactionEntity)
     private transactionRepo: Repository<TransactionEntity>,
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    @InjectRepository(FeeEntity) private feeRepo: Repository<FeeEntity>,
     private httpService: HttpService,
     private configService: ConfigService,
     private refundService: RefundserviceService,
@@ -161,6 +163,15 @@ export class SendService {
       console.log(transaction);
       console.log(`this is from the normal transfer`);
 
+      // create fee
+      const newFee = await this.feeRepo
+        .create({
+          fee: fee,
+          transactionId: transaction.id,
+          coin: payload.transactionCurrency,
+        })
+        .save();
+
       return {
         data: transaction,
         // ...response.data,
@@ -171,5 +182,12 @@ export class SendService {
       throw new InternalServerErrorException(error.response.data.message);
       // run the queue here
     }
+  }
+
+  async getFees() {
+    const fees = await this.feeRepo.find();
+    return {
+      data: fees,
+    };
   }
 }

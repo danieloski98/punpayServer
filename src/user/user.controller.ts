@@ -20,6 +20,7 @@ import { WalletService } from './services/wallet/wallet.service';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 import { OtpService } from 'src/global-services/otp/otp.service';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
+import { UpdateDTO } from './DTO/UpdateDTO';
 
 export interface IUser {
   id: string;
@@ -79,6 +80,13 @@ export class UserController {
     );
   }
 
+  @ApiTags('USER')
+  @ApiParam({ name: 'userId' })
+  @Get('next-of-kin/:userId')
+  getNextofKin(@Param('userId') userId: string) {
+    return this.nextofkinService.getNextOfKin(userId);
+  }
+
   @UseGuards(AuthorizationGuard)
   @ApiTags('USER')
   @ApiBody({ type: ChangePasswordDTO })
@@ -91,7 +99,6 @@ export class UserController {
   @UseGuards(new AuthorizationGuard())
   @Get('balance')
   getBalance(@User() User: IUser) {
-    console.log('balance');
     return this.balanceService.getBalance(User.id);
   }
 
@@ -128,5 +135,23 @@ export class UserController {
   @Put('enable-user/:id')
   enableUser(@Param('id') id: string) {
     return this.crudService.enabledAccount(id);
+  }
+
+  @UseGuards(AuthorizationGuard)
+  @ApiTags('USER')
+  @ApiParam({ name: 'id' })
+  @ApiBody({ type: UpdateDTO })
+  @Put(':id')
+  updateUser(@Param('id') id: string, @Body() body: UpdateDTO) {
+    return this.crudService.updateUserDetails(id, body);
+  }
+
+  @UseGuards(new AdminAuthGuard())
+  @ApiTags('ADMIN')
+  @ApiParam({ name: 'userId' })
+  @ApiBody({ type: UpdateDTO })
+  @Put('admin/update-user-details/:userId')
+  updateUserAdmin(@Param('userId') userId: string, @Body() body: UpdateDTO) {
+    return this.crudService.adminupdateUserDetails(userId, body);
   }
 }

@@ -121,7 +121,7 @@ export class VerificationService {
     };
   }
 
-  async rejecttDocument(userId: string) {
+  async rejecttDocument(userId: string, reason = '') {
     const user = await this.userRepo.findOne({ where: { id: userId } });
 
     if (user === null) {
@@ -145,7 +145,9 @@ export class VerificationService {
     // send an email to the user
     this.emailService.sendApprovedEmailEmail(
       user.email,
-      `The document you uploaded has been rejected, please reupload you document`,
+      `The document you uploaded has been rejected, please reupload you document. the reason for the decline 
+        REASON - ${reason}
+      `,
     );
 
     return {

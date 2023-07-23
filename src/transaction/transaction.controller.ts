@@ -138,6 +138,12 @@ export class TransactionController {
     );
   }
 
+  //@UseGuards(new AdminAuthGuard())
+  @Get('fees')
+  getFees() {
+    return this.sendService.getFees();
+  }
+
   @UseGuards(AuthorizationGuard)
   @ApiBody({ type: SellDTO })
   @Post('sell')
