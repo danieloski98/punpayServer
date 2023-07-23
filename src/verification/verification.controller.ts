@@ -16,13 +16,14 @@ import { VerificationService } from './verification.service';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { User } from 'src/decorators/user.decorator';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AdminAuthGuard } from 'src/guards/admin-auth.guard';
 import {
   FileFieldsInterceptor,
   FileInterceptor,
 } from '@nestjs/platform-express';
 import { UploadDto } from './dto/upload-dto';
+import { RejectDTO } from './dto/rejectDTO';
 
 @ApiTags('VERIFICATION')
 @Controller('verification')
@@ -65,9 +66,10 @@ export class VerificationController {
 
   @Delete('reject/:userId')
   @ApiParam({ name: 'userId' })
+  @ApiBody({ type: RejectDTO })
   @UseGuards(AdminAuthGuard)
-  deleteveification(@Param('userId') userId: string) {
-    return this.verificationService.rejecttDocument(userId);
+  deleteveification(@Param('userId') userId: string, @Body() body: RejectDTO) {
+    return this.verificationService.rejecttDocument(userId, body.reason);
   }
 
   @Post(':userId')

@@ -44,6 +44,9 @@ export class UserEntity extends BaseEntity {
   password: string;
 
   @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
   pin: string;
 
   @Column({ default: new Date().toISOString() })

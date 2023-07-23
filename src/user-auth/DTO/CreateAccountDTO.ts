@@ -25,6 +25,10 @@ export class CreateAccountDTO {
 
   @ApiProperty()
   @IsNotEmpty()
+  phone: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   @MinLength(8)
   password: string;
 }

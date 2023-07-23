@@ -35,6 +35,24 @@ export class BuyService {
 
   async initiateBuy(payload: BuyDTO) {
     console.log(payload);
+    const userId = payload.userId;
+    const buyTransactions = await this.transactionRepo.find({
+      where: [
+        {
+          userId,
+          transactionType: TRANSACTION_TYPE.BUY,
+          status: TRANSACTION_STATUS.PENDING,
+        },
+        {
+          userId,
+          transactionType: TRANSACTION_TYPE.BUY,
+          status: TRANSACTION_STATUS.PROCESSING,
+        },
+      ],
+    });
+    if (buyTransactions.length > 0) {
+      throw new BadRequestException('You still have pending BUY transactions');
+    }
     if (
       !SUPPORTED_CURRENCY.includes(payload.transactionCurrency) ||
       !SUPPORTED_CURRENCY.includes(payload.payoutCurrency)

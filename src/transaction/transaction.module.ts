@@ -16,6 +16,7 @@ import { EmailService } from 'src/global-services/email/email.service';
 import { NotificationModule } from 'src/notification/notification.module';
 import { BullModule } from '@nestjs/bull';
 import { RefundserviceService } from './refundservice/refundservice.service';
+import { FeeEntity } from './entities/fees.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RefundserviceService } from './refundservice/refundservice.service';
       BankEntity,
       UserEntity,
       AdminEntity,
+      FeeEntity,
     ]),
     HttpModule.register({}),
     NotificationModule,

@@ -6,6 +6,8 @@ import { ERROR_CODES } from 'src/UTILS/ErrorCodes';
 import { Repository } from 'typeorm';
 import { compare, genSalt, hash } from 'bcrypt';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
+import { UpdateDTO } from 'src/user/DTO/UpdateDTO';
+import { CreateAccountDTO } from 'src/user-auth/DTO/CreateAccountDTO';
 
 @Injectable()
 export class CrudService {
@@ -90,6 +92,36 @@ export class CrudService {
     await this.userRepo.update({ id: user.id }, { accountDisabled: false });
     return {
       message: 'User account enabled',
+    };
+  }
+
+  async updateUserDetails(id: string, payload: UpdateDTO) {
+    const user = await this.userRepo.findOne({ where: { id } });
+
+    if (user === null || user === undefined) {
+      throw new BadRequestException('User not found');
+    }
+
+    // update details
+    await this.userRepo.update({ id: user.id }, payload);
+
+    return {
+      message: 'details updated',
+    };
+  }
+
+  async adminupdateUserDetails(id: string, payload: UpdateDTO) {
+    const user = await this.userRepo.findOne({ where: { id } });
+
+    if (user === null || user === undefined) {
+      throw new BadRequestException('User not found');
+    }
+
+    // update details
+    await this.userRepo.update({ id: user.id }, payload);
+
+    return {
+      message: 'details updated',
     };
   }
 }

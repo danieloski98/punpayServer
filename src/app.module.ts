@@ -23,6 +23,7 @@ import { NotificationsService } from './global-services/notifications/notificati
 import { NotificationModule } from './notification/notification.module';
 import { BullModule } from '@nestjs/bull';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     WebhookModule,
     VerificationModule,
     NotificationModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [
