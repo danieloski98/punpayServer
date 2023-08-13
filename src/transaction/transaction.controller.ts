@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -60,9 +61,16 @@ export class TransactionController {
   // }
 
   // @UseGuards(new AdminAuthGuard())
+  @ApiQuery({
+    name: 'status',
+    type: String,
+    description:
+      '0 = PEDNING, 1 = PROCESSING, 2 = CONFIRMED, 3 = PAID, 4 = FAILED, 5 = CANCELLED',
+  })
   @Get('admin-all')
-  getAllTransactions() {
-    return this.transactionService.getAllTransactions();
+  getAllTransactions(@Query('status') status: string) {
+    console.log(typeof status);
+    return this.transactionService.getAllTransactions(parseInt(status));
   }
 
   @UseGuards(new AdminAuthGuard())
@@ -194,5 +202,15 @@ export class TransactionController {
   @Put('decline-transaction')
   async Payout(@Body() body: ApproveTransactionDTO) {
     return await this.transactionService.declienTransaction(body.id);
+  }
+
+  @UseGuards(new AdminAuthGuard())
+  @ApiParam({
+    name: 'transactionId',
+    type: String,
+  })
+  @Delete('cancel-transaction/:transactionId')
+  async cancel(@Param('transactionId') body: string) {
+    return await this.transactionService.CancelTransaction(body);
   }
 }

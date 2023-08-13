@@ -4,4 +4,5 @@ export enum TRANSACTION_STATUS {
   CONFIRMED,
   PAID,
   FAILED,
+  CANCELLED,
 }
