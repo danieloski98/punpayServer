@@ -336,7 +336,26 @@ export class TransactionsService {
     };
   }
 
-  async getAllTransactions() {
+  async getAllTransactions(status?: number) {
+    console.log(status === null);
+    if (status !== undefined && status === 0) {
+      const trx = await this.transactionRepo.find({
+        where: { status: TRANSACTION_STATUS.PENDING },
+        relations: ['user'],
+      });
+      return {
+        data: trx,
+      };
+    }
+    if (status !== undefined && status !== TRANSACTION_STATUS.PENDING) {
+      const trx = await this.transactionRepo.find({
+        where: { status },
+        relations: ['user'],
+      });
+      return {
+        data: trx,
+      };
+    }
     const trx = await this.transactionRepo.find({
       relations: ['user'],
     });
@@ -447,6 +466,37 @@ export class TransactionsService {
       );
       return {
         message: 'Transaction approved',
+      };
+    } else {
+      throw new BadRequestException('Transaction already approved or declined');
+    }
+  }
+
+  async CancelTransaction(id: string) {
+    const transaction = await this.transactionRepo.findOne({
+      where: { id },
+    });
+    if (transaction === null) {
+      throw new BadRequestException('Transaction not found');
+    }
+    // get the user details
+    const user = await this.userRepo.findOne({
+      where: { id: transaction.userId },
+    });
+
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (transaction.status !== TRANSACTION_STATUS.CANCELLED) {
+      await this.transactionRepo.update(
+        { id },
+        { status: TRANSACTION_STATUS.CANCELLED },
+      );
+      // send email to the user
+
+      return {
+        message: 'Transaction cancelled',
       };
     } else {
       throw new BadRequestException('Transaction already approved or declined');
