@@ -210,4 +210,13 @@ export class CrudService {
       messgae: 'Password changed',
     };
   }
+
+  async getAdminById(id: string) {
+    const admin = await this.adminRepo.findOne({ where: { id } });
+    if (admin === null) throw new BadRequestException('Admin not found');
+    return {
+      message: 'Admin found',
+      data: admin,
+    };
+  }
 }
