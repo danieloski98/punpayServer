@@ -337,7 +337,15 @@ export class TransactionsService {
   }
 
   async getAllTransactions(status?: number) {
-    console.log(status === null);
+    console.log(status);
+    if (status === null || status === undefined) {
+      const trx = await this.transactionRepo.find({
+        relations: ['user'],
+      });
+      return {
+        data: trx,
+      };
+    }
     if (status !== undefined && status === 0) {
       const trx = await this.transactionRepo.find({
         where: { status: TRANSACTION_STATUS.PENDING },

@@ -64,13 +64,16 @@ export class TransactionController {
   @ApiQuery({
     name: 'status',
     type: String,
+    required: false,
     description:
       '0 = PEDNING, 1 = PROCESSING, 2 = CONFIRMED, 3 = PAID, 4 = FAILED, 5 = CANCELLED',
   })
   @Get('admin-all')
   getAllTransactions(@Query('status') status: string) {
     console.log(typeof status);
-    return this.transactionService.getAllTransactions(parseInt(status));
+    return this.transactionService.getAllTransactions(
+      status === undefined ? undefined : parseInt(status),
+    );
   }
 
   @UseGuards(new AdminAuthGuard())

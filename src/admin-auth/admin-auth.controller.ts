@@ -85,12 +85,11 @@ export class AdminAuthController {
   }
 
   @ApiTags('ADMIN-AUTH')
-  @Get()
-  @Roles('View', 'Transaction')
-  @UseGuards(RolecheckGuard)
-  getRoles() {
-    return {
-      message: 'ehllo',
-    };
+  @Get('/get-admin-by-id/:id')
+  @ApiParam({ name: 'id', type: String })
+  // @Roles('View', 'Transaction')
+  // @UseGuards(RolecheckGuard)
+  getRoles(@Param('id') id: string) {
+    return this.crudService.getAdminById(id);
   }
 }
