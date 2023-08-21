@@ -24,28 +24,32 @@ export class TransactionsService {
       const endDay = moment(endDate ? endDate : Date.now()).endOf('day');
       if (status > -1) {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('day').format('YYYY-MM-DD'),
           })
-          .andWhere('createdAt <= :before', {
+          .andWhere('transaction.createdAt <= :before', {
             before: moment(endDay).endOf('day').format('YYYY-MM-DD'),
           })
           // .andWhere('transactionType = :type', { type: transactionType })
           .andWhere('status = :status', { status })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           .getMany();
         return {
           data,
         };
       } else {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('day').format('YYYY-MM-DD'),
           })
-          .andWhere('createdAt <= :before', {
+          .andWhere('transaction.createdAt <= :before', {
             before: moment(endDay).endOf('day').format('YYYY-MM-DD'),
           })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           // .andWhere('transactionType = :type', { type: transactionType })
           // .andWhere('status = :status', { status })
           .getMany();
@@ -59,21 +63,25 @@ export class TransactionsService {
     if (filter === 'daily') {
       if (status > -1) {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('day').format('YYYY-MM-DD'),
           })
           .andWhere('status = :status', { status })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           .getMany();
         return {
           data,
         };
       } else {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('day').format('YYYY-MM-DD'),
           })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           // .andWhere('createdAt <= :before', {
           //   before: moment().endOf('day').format('YYYY-MM-DD'),
           // })
@@ -87,21 +95,25 @@ export class TransactionsService {
     } else if (filter === 'monthly') {
       if (status > -1) {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('month').format('YYYY-MM-DD'),
           })
           .andWhere('status = :status', { status })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           .getMany();
         return {
           data,
         };
       } else {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(startDay).startOf('month').format('YYYY-MM-DD'),
           })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           // .andWhere('createdAt <= :before', {
           //   before: moment().endOf('month').format('YYYY-MM-DD'),
           // })
@@ -115,21 +127,25 @@ export class TransactionsService {
     } else if (filter === 'yearly') {
       if (status > -1) {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(date).startOf('year').format('YYYY-MM-DD'),
           })
           .andWhere('status = :status', { status })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           .getMany();
         return {
           data,
         };
       } else {
         const data = await this.transactionRepo
-          .createQueryBuilder()
-          .where('createdAt >= :after', {
+          .createQueryBuilder('transaction')
+          .where('transaction.createdAt >= :after', {
             after: moment(date).startOf('year').format('YYYY-MM-DD'),
           })
+          .leftJoinAndSelect('transaction.user', 'user')
+          .orderBy('transaction.createdAt', 'DESC')
           // .andWhere('createdAt <= :before', {
           //   before: moment().endOf('year').format('YYYY-MM-DD'),
           // })
@@ -145,9 +161,12 @@ export class TransactionsService {
       if (status > -1) {
         data = await this.transactionRepo.find({
           where: { status },
+          relations: ['user'],
         });
       } else {
-        data = await this.transactionRepo.find({});
+        data = await this.transactionRepo.find({
+          relations: ['user'],
+        });
       }
       return {
         data,
