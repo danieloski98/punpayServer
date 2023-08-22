@@ -213,7 +213,7 @@ export class TransactionController {
     name: 'transactionId',
     type: String,
   })
-  @Patch('cancel-transaction/:transactionId')
+  @Delete('cancel-transaction/:transactionId')
   async cancel(@Param('transactionId') body: string) {
     return await this.transactionService.CancelTransaction(body);
   }

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -64,7 +65,7 @@ export class VerificationController {
     return this.verificationService.approveDocument(userId);
   }
 
-  @Delete('reject/:userId')
+  @Patch('reject/:userId')
   @ApiParam({ name: 'userId' })
   @ApiBody({ type: RejectDTO })
   @UseGuards(AdminAuthGuard)
