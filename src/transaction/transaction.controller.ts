@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -212,7 +213,7 @@ export class TransactionController {
     name: 'transactionId',
     type: String,
   })
-  @Delete('cancel-transaction/:transactionId')
+  @Patch('cancel-transaction/:transactionId')
   async cancel(@Param('transactionId') body: string) {
     return await this.transactionService.CancelTransaction(body);
   }
