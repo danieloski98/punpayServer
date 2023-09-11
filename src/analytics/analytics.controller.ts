@@ -15,6 +15,15 @@ export class AnalyticsController {
   getUsers() {
     return this.user.getUserAnalytics();
   }
+  @ApiQuery({
+    name: 'coin',
+    description:
+      'can be NONE | btc | eth | usdt | busd | doge | bnb | xrp | ltc',
+  })
+  @Get('total/transaction-total')
+  getTotal(@Query('coin') coin: string) {
+    return this.transactions.getTransactionAnalytics(coin);
+  }
 
   // @ApiQuery({
   //   name: 'transactionType',

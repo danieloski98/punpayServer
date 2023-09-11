@@ -1,3 +1,4 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
   Injectable,
@@ -5,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { quidax } from 'src/UTILS/quidax';
-import { Wallet } from 'src/types/wallet';
+import { NewWallet, Wallet } from 'src/types/wallet';
 import { UserEntity } from 'src/user-auth/Entity/user.entity';
 import { Repository } from 'typeorm';
 const WALLETS = [
@@ -23,6 +24,7 @@ const WALLETS = [
 export class WalletService {
   constructor(
     @InjectRepository(UserEntity) private userRepo: Repository<UserEntity>,
+    private httpService: HttpService,
   ) {}
 
   async getWallets(userId: string) {
@@ -86,6 +88,87 @@ export class WalletService {
       }
     } catch (error) {
       throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async getAddress(userId: string, currency: string, network: string) {
+    const user = await this.userRepo.findOne({ where: { id: userId } });
+    if (user === null) {
+      throw new BadRequestException('User not found');
+    }
+    try {
+      const request = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${currency}/addresses`,
+        {
+          headers: {
+            authorization: `Bearer ${process.env.QDX_SECRET}`,
+            'Accept-Encoding': 'gzip,deflate,compress',
+          },
+        },
+      );
+      // .catch((error) => {
+      //   console.log(error.response);
+      //   return error.response;
+      // });
+      const data = request.data.data as NewWallet[];
+      //console.log(request.data.data);
+      const wallet = await data.filter((item) => item.network === network)[0];
+      console.log(wallet);
+
+      if (wallet === null || wallet === undefined) {
+        try {
+          // create new wallet
+          const newWallet = await this.httpService.axiosRef.post(
+            `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${currency}/addresses?network=${network}`,
+            {},
+            {
+              headers: {
+                authorization: `Bearer ${process.env.QDX_SECRET}`,
+                'Accept-Encoding': 'gzip,deflate,compress',
+              },
+            },
+          );
+          // .catch((error) => {
+          //   return error.response;
+          // });
+
+          if (newWallet.data.data.address === null) {
+            const request = await this.httpService.axiosRef.get(
+              `https://www.quidax.com/api/v1/users/${user.quidaxId}/wallets/${currency}/addresses`,
+              {
+                headers: {
+                  authorization: `Bearer ${process.env.QDX_SECRET}`,
+                  'Accept-Encoding': 'gzip,deflate,compress',
+                },
+              },
+            );
+            // .catch((error) => {
+            //   console.log(error.response);
+            //   return error.response.message;
+            // });
+            const data = request.data.data as NewWallet[];
+            //console.log(request.data.data);
+            const wallet = await data.filter(
+              (item) => item.network === network,
+            )[0];
+
+            return {
+              data: wallet,
+            };
+          }
+          return this.getAddress(user.id, currency, network);
+        } catch (error) {
+          console.log(error);
+          throw new BadRequestException(`${error.response.data.message}`);
+        }
+      }
+
+      return {
+        data: wallet,
+      };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException(error.response);
     }
   }
 }

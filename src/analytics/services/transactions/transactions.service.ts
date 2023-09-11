@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import moment from 'moment';
+import { TRANSACTION_TYPE } from 'src/Enums/TRANSACTION_TYPE';
+import { SUPPORTED_CURRENCY } from 'src/UTILS/supportedcoins';
 
 @Injectable()
 export class TransactionsService {
@@ -170,6 +172,97 @@ export class TransactionsService {
       }
       return {
         data,
+      };
+    }
+  }
+
+  async getTransactionAnalytics(coin: string) {
+    console.log(`this is the coin ${coin}`);
+    // if (coin !== 'NONE' || !SUPPORTED_CURRENCY.includes(coin)) {
+    //   throw new BadRequestException('Invalid query');
+    // }
+    if (coin !== 'NONE') {
+      const totalWithDrawal = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.SEND,
+          transactionCurrency: coin,
+        },
+      });
+
+      const totalDeposits = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.RECIEVED,
+          transactionCurrency: coin,
+        },
+      });
+
+      const totalBuy = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.BUY,
+          payoutCurrency: coin,
+        },
+      });
+
+      const totalSell = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.SELL,
+          transactionCurrency: coin,
+        },
+      });
+
+      return {
+        data: {
+          totalWithDrawal: totalWithDrawal[0].reduce(
+            (acc, currr) => acc + currr.transactionAmount,
+            0,
+          ),
+          totalBuy: totalBuy[0].reduce(
+            (acc, curr) => acc + curr.payoutAmount,
+            0,
+          ),
+          totalDeposits: totalDeposits[0].reduce(
+            (acc, curr) => acc + curr.transactionAmount,
+            0,
+          ),
+          totalSell: totalSell[0].reduce(
+            (acc, curr) => acc + curr.transactionAmount,
+            0,
+          ),
+        },
+      };
+    }
+    if (coin === 'NONE') {
+      const totalWithDrawal = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.SEND,
+        },
+      });
+
+      const totalDeposits = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.RECIEVED,
+        },
+      });
+
+      const totalBuy = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.BUY,
+        },
+      });
+
+      const totalSell = await this.transactionRepo.findAndCount({
+        where: {
+          transactionType: TRANSACTION_TYPE.SELL,
+        },
+      });
+
+      return {
+        data: {
+          totalWithDrawal: totalWithDrawal[1],
+          totalBuy: totalBuy[1],
+          totalDeposits: totalDeposits[1],
+          totalSell: totalSell[1],
+        },
       };
     }
   }

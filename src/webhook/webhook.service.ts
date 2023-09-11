@@ -246,7 +246,8 @@ export class WebhookService {
       return;
     }
   }
-  private async depositSuccessful(body: depositSuccessful) {
+
+  private async depositCreated(body: depositSuccessful) {
     const user = await this.userRepo.findOne({
       where: { quidaxId: body.data.user.id },
     });
@@ -262,23 +263,44 @@ export class WebhookService {
           hash: body.data.txid,
           userId: user.id,
           quidaxTransactionId: body.data.id,
-          status: TRANSACTION_STATUS.PAID,
+          status: TRANSACTION_STATUS.PENDING,
           transactionType: TRANSACTION_TYPE.RECIEVED,
           transactionReference: randomUUID(),
           createdAt: new Date().toISOString(),
         })
         .save();
+    }
+  }
+  private async depositSuccessful(body: depositSuccessful) {
+    const entry = await this.transactionRepo.findOne({
+      where: { quidaxTransactionId: body.data.id },
+    });
+
+    const user = await this.userRepo.findOne({
+      where: { quidaxId: body.data.user.id },
+    });
+
+    if (entry === null) {
+      return;
+    } else {
+      // updated transaction status
+      await this.transactionRepo.update(
+        { quidaxTransactionId: body.data.id },
+        { status: TRANSACTION_STATUS.PAID },
+      );
       await this.notificationService.sendUserNotification(
         user.id,
         'Deposit Successful',
-        `A deposit of ${body.data.amount}-${body.data.currency} was made to your wallet
-              ${body.data.wallet.deposit_address}`,
+        `A deposit of ${body.data.amount}-${body.data.currency} was made to your wallet`,
       );
     }
   }
 
   async handleWebHook(body: any) {
     switch (body.event) {
+      case WEBHOOKS.DEPOSIT_CONFIRMATION: {
+        this.depositCreated(body);
+      }
       case WEBHOOKS.DEPOSIT_SUCCESSFUL: {
         this.depositSuccessful(body);
         break;
