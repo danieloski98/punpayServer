@@ -170,7 +170,7 @@ export class TransactionController {
     return await this.buyService.initiateBuy(body);
   }
 
-  @UseGuards(AuthorizationGuard)
+  // @UseGuards(AuthorizationGuard)
   @ApiBody({ type: SendDTO })
   @Post('withdraw')
   async withdrawRequest(@Body() body: SendDTO) {

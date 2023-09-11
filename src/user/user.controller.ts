@@ -4,10 +4,11 @@ import {
   Get,
   Param,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { User } from 'src/decorators/user.decorator';
 import { AuthorizationGuard } from 'src/guards/authorization.guard';
@@ -109,6 +110,20 @@ export class UserController {
   getWallet(@User() User: IUser, @Param('currency') param: any) {
     console.log('balance');
     return this.walletService.getWalletById(User.id, param);
+  }
+
+  @ApiTags('USER')
+  @UseGuards(new AuthorizationGuard())
+  @ApiParam({ name: 'currency' })
+  @ApiQuery({ name: 'network', type: String })
+  @Get('address/:currency')
+  getAddress(
+    @User() User: IUser,
+    @Param('currency') param: any,
+    @Query('network') network: string,
+  ) {
+    console.log(User);
+    return this.walletService.getAddress(User.id, param, network);
   }
 
   @UseGuards(AuthorizationGuard)

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosError } from 'axios';
@@ -20,6 +21,7 @@ import { FeeEntity } from 'src/transaction/entities/fees.entity';
 
 @Injectable()
 export class SendService {
+  private logger = new Logger(SendService.name);
   constructor(
     @InjectRepository(TransactionEntity)
     private transactionRepo: Repository<TransactionEntity>,
@@ -31,7 +33,6 @@ export class SendService {
   ) {}
 
   async sendCrypto(payload: SendDTO) {
-    console.log(payload);
     // verify the user
     const user = await this.userRepo.findOne({
       where: { id: payload.userId },
@@ -42,34 +43,61 @@ export class SendService {
     if (!SUPPORTED_CURRENCY.includes(payload.transactionCurrency)) {
       throw new BadRequestException('Currency not supported');
     }
-    // get withdrawalFee
-    let fee = '0';
-    let wallet;
-    try {
-      // Get Admin address for the tranfer
-      const fees = await this.httpService.axiosRef.get(
-        ` https://www.quidax.com/api/v1/users/me/wallets/${payload.transactionCurrency}/address`,
-        {
-          headers: {
-            'Accept-Encoding': 'gzip,deflate,compress',
-            authorization: `Bearer ${this.configService.get<string>(
-              'QDX_SECRET',
-            )}`,
-          },
-        },
-      );
-      if (fees.data.status !== 'success') {
-        throw new BadRequestException('Invalid Address');
-      }
-      wallet = fees.data.data.address;
-      console.log(fees.data.data);
-    } catch (error) {
-      throw new InternalServerErrorException(error.message);
+
+    // if (!user.KYCVerified) {
+    //   throw new BadRequestException(
+    //     'You have to verify your account before you will be able to witthdraw',
+    //   );
+    // }
+
+    // checking if the users balance is upto the amount to send
+    const fee = await this.getTransactionFee(payload.transactionCurrency);
+    const walletBalance = await this.checkBalance(
+      user.quidaxId,
+      payload.transactionCurrency,
+    );
+
+    const transactionAmount = fee + payload.transactionAmount;
+
+    if (transactionAmount > walletBalance) {
+      throw new BadRequestException('Insufficient Balance');
     }
+
+    const adminAddress = await this.getAdminWalletAddress(
+      'me',
+      payload.transactionCurrency,
+    );
+
+    // verify the wallet address
+    const isAddressValid = await this.validateAddress(
+      payload.transactionCurrency,
+      payload.withdrawalAddress,
+    );
+
+    if (!isAddressValid) {
+      throw new BadRequestException('Invalid address');
+    }
+
+    const sendMoney = await this.makeTransfer(payload);
+    const sendAdminFee = await this.sendAdminFee({
+      fee,
+      address: adminAddress,
+      currency: payload.transactionCurrency,
+      transactionAmount: payload.transactionAmount,
+      transactionId: sendMoney.id,
+      user,
+    });
+
+    return {
+      message: 'Transaction is processing',
+    };
+  }
+
+  private async getTransactionFee(currency: string, forFee = false) {
     try {
       // Validate wallet address
       const transactionfees = await this.httpService.axiosRef.get(
-        `https://www.quidax.com/api/v1/fee?currency=${payload.transactionCurrency}`,
+        `https://www.quidax.com/api/v1/fee?currency=${currency}`,
         {
           headers: {
             'Accept-Encoding': 'gzip,deflate,compress',
@@ -82,54 +110,102 @@ export class SendService {
       if (transactionfees.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
-      fee = transactionfees.data.data.fee;
+      const fee = +transactionfees.data.data.fee;
+      if (!forFee) {
+        return fee * 3;
+      }
+      return fee;
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
     }
+  }
 
-    // make the transfer to The Admin wallet
+  private async checkBalance(userId: string, currency: string) {
     try {
-      const response = await this.httpService.axiosRef.post(
-        `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
-        {
-          currency: payload.transactionCurrency,
-          amount: fee,
-          fund_uid: wallet,
-          transaction_note: `withrawal fee for ${payload.transactionAmount}-${payload.transactionCurrency}`,
-        },
+      // get wallet address
+      const transaction = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${userId}/wallets/${currency}`,
         {
           headers: {
             'Accept-Encoding': 'gzip,deflate,compress',
-            authorization: `Bearer ${process.env.QDX_SECRET}`,
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
           },
         },
       );
-    } catch (error) {
-      this.refundService.addRefundransaction({
-        userId: payload.userId,
-        coin: payload.transactionCurrency,
-        amount: fee,
-      });
-      throw new InternalServerErrorException(error.message);
-    }
-
-    try {
-      //Validate wallet address
-      const addressValid = await this.httpService.axiosRef.get(
-        `https://www.quidax.com/api/v1/${payload.transactionCurrency}/${payload.withdrawalAddress}/validate_address`,
-        {
-          headers: {
-            'Accept-Encoding': 'gzip,deflate,compress',
-            authorization: `Bearer ${process.env.QDX_SECRET}`,
-          },
-        },
-      );
-      if (addressValid.data.status !== 'success') {
+      if (transaction.data.status !== 'success') {
         throw new BadRequestException('Invalid Address');
       }
+      this.logger.debug(
+        `WALLET BALANCE ---${+transaction.data.data.balance}---`,
+      );
+      return +transaction.data.data.balance;
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
     }
+  }
+
+  private async validateAddress(currency: string, address: string) {
+    try {
+      // validate wallet address
+      const transaction = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/${currency}/${address}/validate_address`,
+        {
+          headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      if (transaction.data.data.valid) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
+    }
+  }
+
+  // https://www.quidax.com/api/v1/users/{user_id}/wallets/{currency}/address
+
+  private async getAdminWalletAddress(
+    id: 'me' | string,
+    currency: string,
+  ): Promise<string> {
+    if (!SUPPORTED_CURRENCY.includes(currency)) {
+      throw new BadRequestException('Currency not supported');
+    }
+    try {
+      // validate wallet address
+      const transaction = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${id}/wallets/${currency}/address`,
+        {
+          headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      return transaction.data.data.address;
+    } catch (error) {
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
+    }
+  }
+
+  private async makeTransfer(payload: SendDTO) {
+    const user = await this.userRepo.findOne({
+      where: { id: payload.userId },
+    });
 
     try {
       const response = await this.httpService.axiosRef.post(
@@ -160,27 +236,65 @@ export class SendService {
           transactionReference: randomUUID(),
         })
         .save();
-      console.log(transaction);
-      console.log(`this is from the normal transfer`);
+      this.logger.log(
+        `TRANSACTION SUCCESSFUL --------------------------------`,
+      );
+      return transaction;
+    } catch (error) {
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
+    }
+  }
+
+  private async sendAdminFee({
+    currency,
+    fee,
+    address,
+    transactionAmount,
+    transactionId,
+    user,
+  }: {
+    currency: string;
+    fee: number;
+    address: string;
+    transactionAmount: number;
+    transactionId: string;
+    user: UserEntity;
+  }) {
+    // make the transfer to The Admin wallet
+    try {
+      const response = await this.httpService.axiosRef.post(
+        `https://www.quidax.com/api/v1/users/${user.quidaxId}/withdraws`,
+        {
+          currency: currency,
+          amount: await this.getTransactionFee(currency, true),
+          fund_uid: address,
+          transaction_note: `withrawal fee for ${transactionAmount}-${currency}`,
+        },
+        {
+          headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
+            authorization: `Bearer ${process.env.QDX_SECRET}`,
+          },
+        },
+      );
 
       // create fee
       const newFee = await this.feeRepo
         .create({
-          fee: fee,
-          transactionId: transaction.id,
-          coin: payload.transactionCurrency,
+          fee: (await this.getTransactionFee(currency, true)).toString(),
+          transactionId: transactionId,
+          coin: currency,
         })
         .save();
-
-      return {
-        data: transaction,
-        // ...response.data,
-      };
+      this.logger.log(`ADMIN FEE COLLECTED`);
     } catch (error) {
-      //throw new InternalServerErrorException(error.message);
-      console.log(`this is from the normal transfer`);
-      throw new InternalServerErrorException(error.response.data.message);
-      // run the queue here
+      // this.refundService.addRefundransaction({
+      //   userId: payload.userId,
+      //   coin: payload.transactionCurrency,
+      //   amount: fee,
+      // });
+      throw new InternalServerErrorException(error.message);
     }
   }
 

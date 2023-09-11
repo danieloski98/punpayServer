@@ -11,11 +11,13 @@ import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { OtpService } from 'src/global-services/otp/otp.service';
 import { EmailService } from 'src/global-services/email/email.service';
 import { BankEntity } from 'src/bank/Entities/bank.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     UserAuthModule,
     TypeOrmModule.forFeature([AdminEntity, BankEntity]),
+    HttpModule,
   ],
   controllers: [UserController],
   providers: [
