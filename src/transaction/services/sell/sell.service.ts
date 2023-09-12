@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosError } from 'axios';
@@ -18,11 +19,14 @@ import { TRANSACTION_STATUS } from 'src/Enums/TRANSACTION_STATUS';
 import { AdminEntity } from 'src/admin-auth/Entities/admin.entity';
 import { NotificationService } from 'src/notification/notification.service';
 import { ADMINROLE } from 'src/Enums/AdminRoles';
+import { ConfigService } from '@nestjs/config';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config();
 
 @Injectable()
 export class SellService {
+  private logger = new Logger(SellService.name);
+
   constructor(
     @InjectRepository(TransactionEntity)
     private transactionRepo: Repository<TransactionEntity>,
@@ -31,6 +35,7 @@ export class SellService {
     @InjectRepository(AdminEntity) private adminRepo: Repository<AdminEntity>,
     private httpService: HttpService,
     private notificationService: NotificationService,
+    private configService: ConfigService,
   ) {}
 
   async fetchAdminAddress(currency: string) {
@@ -61,6 +66,19 @@ export class SellService {
       }
       if (!SUPPORTED_CURRENCY.includes(payload.transactionCurrency)) {
         throw new BadRequestException('Currency not supported');
+      }
+      const fee = await this.getTransactionFee(
+        payload.transactionCurrency,
+        true,
+      );
+
+      const balance = await this.checkBalance(
+        user.quidaxId,
+        payload.transactionCurrency,
+      );
+
+      if (payload.transactionAmount + fee > balance) {
+        throw new BadRequestException('Insufficient funds');
       }
       // get ths admin currency
       const currency = await this.fetchAdminAddress(
@@ -148,6 +166,61 @@ export class SellService {
       return {
         message: 'Transaction completed',
       };
+    }
+  }
+
+  private async checkBalance(userId: string, currency: string) {
+    try {
+      // get wallet address
+      const transaction = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/users/${userId}/wallets/${currency}`,
+        {
+          headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      if (transaction.data.status !== 'success') {
+        throw new BadRequestException('Invalid Address');
+      }
+      this.logger.debug(
+        `WALLET BALANCE ---${+transaction.data.data.balance}---`,
+      );
+      return +transaction.data.data.balance;
+    } catch (error) {
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
+    }
+  }
+
+  private async getTransactionFee(currency: string, forFee = false) {
+    try {
+      // Validate wallet address
+      const transactionfees = await this.httpService.axiosRef.get(
+        `https://www.quidax.com/api/v1/fee?currency=${currency}`,
+        {
+          headers: {
+            'Accept-Encoding': 'gzip,deflate,compress',
+            authorization: `Bearer ${this.configService.get<string>(
+              'QDX_SECRET',
+            )}`,
+          },
+        },
+      );
+      if (transactionfees.data.status !== 'success') {
+        throw new BadRequestException('Invalid Address');
+      }
+      const fee = +transactionfees.data.data.fee;
+      if (!forFee) {
+        return fee * 3;
+      }
+      return fee;
+    } catch (error) {
+      console.log(error.response.data.message);
+      throw new InternalServerErrorException(error.response.data.message);
     }
   }
 }
