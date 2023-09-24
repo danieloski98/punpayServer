@@ -44,11 +44,11 @@ export class SendService {
       throw new BadRequestException('Currency not supported');
     }
 
-    if (!user.KYCVerified) {
-      throw new BadRequestException(
-        'You have to verify your account before you will be able to witthdraw',
-      );
-    }
+    // if (!user.KYCVerified) {
+    //   throw new BadRequestException(
+    //     'You have to verify your account before you will be able to witthdraw',
+    //   );
+    // }
 
     // checking if the users balance is upto the amount to send
     const fee = await this.getTransactionFee(payload.transactionCurrency);
