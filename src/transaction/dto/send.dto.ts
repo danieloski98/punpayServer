@@ -27,4 +27,10 @@ export class SendDTO {
   @ApiProperty()
   @Expose()
   withdrawalAddress: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty()
+  @Expose()
+  network: string;
 }

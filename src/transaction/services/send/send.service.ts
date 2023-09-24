@@ -44,11 +44,11 @@ export class SendService {
       throw new BadRequestException('Currency not supported');
     }
 
-    // if (!user.KYCVerified) {
-    //   throw new BadRequestException(
-    //     'You have to verify your account before you will be able to witthdraw',
-    //   );
-    // }
+    if (!user.KYCVerified) {
+      throw new BadRequestException(
+        'You have to verify your account before you will be able to witthdraw',
+      );
+    }
 
     // checking if the users balance is upto the amount to send
     const fee = await this.getTransactionFee(payload.transactionCurrency);
@@ -68,14 +68,16 @@ export class SendService {
       payload.transactionCurrency,
     );
 
-    // verify the wallet address
-    const isAddressValid = await this.validateAddress(
-      payload.transactionCurrency,
-      payload.withdrawalAddress,
-    );
+    // // verify the wallet address
+    if (payload.transactionCurrency !== 'usdt' && payload.network !== 'trc20') {
+      const isAddressValid = await this.validateAddress(
+        payload.transactionCurrency,
+        payload.withdrawalAddress,
+      );
 
-    if (!isAddressValid) {
-      throw new BadRequestException('Invalid address');
+      if (!isAddressValid) {
+        throw new BadRequestException('Invalid address');
+      }
     }
 
     const sendMoney = await this.makeTransfer(payload);
@@ -215,6 +217,7 @@ export class SendService {
           amount: payload.transactionAmount.toString(),
           fund_uid: payload.withdrawalAddress,
           transaction_note: `withrawal of ${payload.transactionAmount}-${payload.transactionCurrency}`,
+          network: payload.network,
         },
         {
           headers: {
